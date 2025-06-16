@@ -20,7 +20,7 @@ type Storage struct {
 	}
 	TimeSlots interface {
 		GetFreeSlots(context.Context, time.Time) ([]TimeSlot, error)
-		Book(context.Context, int64) error
+		Book(context.Context, int64, int64) error
 	}
 }
 

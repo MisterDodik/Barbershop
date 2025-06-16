@@ -13,6 +13,7 @@ type TimeSlot struct {
 	ID        int64  `json:"id"`
 	IsBooked  bool   `json:"is_booked"`
 	StartTime string `json:"start_time"`
+	User      User   `json:"user"` //koristicu kad budem fetchovao zakazane termine za korisnika
 }
 
 func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Time) ([]TimeSlot, error) {
@@ -22,7 +23,7 @@ func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Ti
 
 	query :=
 		`
-			SELECT * FROM time_slots 
+			SELECT id, is_booked, start_time FROM time_slots 
 			WHERE is_booked = FALSE AND
 			start_time >= $1::timestamp AND start_time < $2::timestamp;
 		`
@@ -59,10 +60,10 @@ func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Ti
 	return timeSlots, nil
 }
 
-func (s *TimeSlotsStorage) Book(ctx context.Context, slotID int64) error {
+func (s *TimeSlotsStorage) Book(ctx context.Context, slotID int64, userID int64) error {
 	query := `
 		UPDATE time_slots
-		SET is_booked = true
+		SET is_booked = true, user_id = $2
 		WHERE id = $1
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -72,6 +73,7 @@ func (s *TimeSlotsStorage) Book(ctx context.Context, slotID int64) error {
 		ctx,
 		query,
 		slotID,
+		userID,
 	)
 	if err != nil {
 		return err
