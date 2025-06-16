@@ -39,6 +39,7 @@ func (app *application) mount() http.Handler {
 		r.Get("/health", app.getHealthHandler)
 
 		r.Route("/appointment", func(r chi.Router) {
+			//authenticated endpoints
 			r.Post("/get_available_dates", app.getAvailableDates) //prilikom loadanja sajta uzeti da je selectedday = null, a to ce automatski biti danasnji dan
 			r.Post("/book/{slotID}", app.bookAppointment)
 		})
