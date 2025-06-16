@@ -1,0 +1,89 @@
+package store
+
+import (
+	"context"
+	"database/sql"
+	"time"
+)
+
+type TimeSlotsStorage struct {
+	db *sql.DB
+}
+type TimeSlot struct {
+	ID        int64  `json:"id"`
+	IsBooked  bool   `json:"is_booked"`
+	StartTime string `json:"start_time"`
+}
+
+func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Time) ([]TimeSlot, error) {
+	year, month, day := selectedDay.Date()
+	start := time.Date(year, month, day, 0, 0, 0, 0, selectedDay.Location())
+	end := start.AddDate(0, 0, 1)
+
+	query :=
+		`
+			SELECT * FROM time_slots 
+			WHERE is_booked = FALSE AND
+			start_time >= $1::timestamp AND start_time < $2::timestamp;
+		`
+	rows, err := s.db.QueryContext(
+		ctx,
+		query,
+		start,
+		end,
+	)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, err //TODO dodaj mozda nesto drugo
+		default:
+			return nil, err
+		}
+	}
+	var timeSlots []TimeSlot
+	for rows.Next() {
+		var slot TimeSlot
+		err := rows.Scan(
+			&slot.ID,
+			&slot.IsBooked,
+			&slot.StartTime,
+		)
+		if err != nil {
+			return timeSlots, err
+		}
+		timeSlots = append(timeSlots, slot)
+	}
+
+	defer rows.Close()
+	return timeSlots, nil
+}
+
+func (s *TimeSlotsStorage) Book(ctx context.Context, slotID int64) error {
+	query := `
+		UPDATE time_slots
+		SET is_booked = true
+		WHERE id = $1
+	`
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := s.db.ExecContext(
+		ctx,
+		query,
+		slotID,
+	)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return Error_NotFound
+	}
+	return nil
+}
