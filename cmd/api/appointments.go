@@ -46,7 +46,13 @@ func (app *application) bookAppointment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := app.store.TimeSlots.Book(r.Context(), slotID); err != nil {
+	// user := getUserFromContext(r)
+	// if user == nil {
+	// 	log.Println("nemas ti njega prijatelju. stavi inace error neki, jer znaci da nije authenticateovano (valjda?)")
+	// }
+
+	//ovdje umjesto 1 treba user.ID
+	if err := app.store.TimeSlots.Book(r.Context(), slotID, 1); err != nil {
 		switch err {
 		case store.Error_NotFound:
 			app.notFoundResponse(w, r, err)
