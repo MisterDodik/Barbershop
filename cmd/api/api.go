@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MisterDodik/Barbershop/internal/env"
+
 	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -37,7 +37,10 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{env.GetString("CORS_ALLOWED_ORIGIN", "http://localhost:5173")},
+		AllowedOrigins: []string{
+			"http://localhost:3000",                     // for local dev
+			"https://your-vercel-deployment.vercel.app", // for production
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
@@ -49,6 +52,7 @@ func (app *application) mount() http.Handler {
 
 		r.Route("/appointment", func(r chi.Router) {
 			//authenticated endpoints
+
 			r.Post("/get_available_dates", app.getAvailableDates) //prilikom loadanja sajta uzeti da je selectedday = null, a to ce automatski biti danasnji dan
 			r.Post("/book/{slotID}", app.bookAppointment)
 		})

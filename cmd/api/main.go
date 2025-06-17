@@ -14,7 +14,7 @@ const version = "0.0.1"
 func main() {
 	godotenv.Load()
 	cfg := config{
-		addr: env.GetString("ADDR", ":3000"),
+		addr: env.GetString("ADDR", ":8080"),
 		db: dbConfig{
 			addr:         env.GetString("DB_ADDR", "postgres://postgres:admin@localhost/barbershop?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
