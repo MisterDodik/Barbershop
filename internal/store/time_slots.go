@@ -68,7 +68,7 @@ func (s *TimeSlotsStorage) Book(ctx context.Context, slotID int64, userID int64)
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
-
+	//TODO  -dodaj da izbaci gresku ako se bukira termin koji je vec zauzet
 	rows, err := s.db.ExecContext(
 		ctx,
 		query,
