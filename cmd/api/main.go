@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"time"
 
+	"github.com/MisterDodik/Barbershop/internal/auth"
 	"github.com/MisterDodik/Barbershop/internal/db"
 	"github.com/MisterDodik/Barbershop/internal/env"
 	"github.com/MisterDodik/Barbershop/internal/store"
@@ -21,6 +23,17 @@ func main() {
 			maxIdleConns: env.GetInt("DB_IDLE_OPEN_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_IDLE_TIME", "15m"),
 		},
+		auth: authConfig{
+			basic: basicConfig{
+				username: env.GetString("BASIC_AUTH_USERNAME", "admin"),
+				password: env.GetString("BASIC_AUTH_PASSWORD", "admin"),
+			},
+			token: tokenConfig{
+				secret:  env.GetString("AUTH_TOKEN_SECRET", "example"),
+				expDate: time.Hour * 24 * 3,
+				iss:     env.GetString("AUTH_TOKEN_ISSUER", "admin"),
+			},
+		},
 	}
 
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
@@ -29,9 +42,12 @@ func main() {
 	}
 	store := store.NewStorage(db)
 
+	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
+
 	app := &application{
-		config: cfg,
-		store:  store,
+		config:        cfg,
+		store:         store,
+		authenticator: jwtAuthenticator,
 	}
 
 	mux := app.mount()
