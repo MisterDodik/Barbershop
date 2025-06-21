@@ -10,14 +10,15 @@ import (
 )
 
 type UserPayload struct {
-	Username string `json:"username" validate:"required,max=100"`
-	Email    string `json:"email" validate:"required,email,max=255"`
-	Password string `json:"password" validate:"required,min=3,max=72"`
+	FirstName string `json:"first_name" validate:"required,max=100"`
+	LastName  string `json:"last_name" validate:"required,max=100"`
+	Username  string `json:"username" validate:"required,max=100"`
+	Email     string `json:"email" validate:"required,email,max=255"`
+	Password  string `json:"password" validate:"required,min=3,max=72"`
 }
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	var payload UserPayload
-	//TODO - dodaj ime i prezime koji nisu unique
 	if err := readJSON(w, r, &payload); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -28,15 +29,16 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	user := &store.User{
-		Username: payload.Username,
-		Email:    payload.Email,
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		Username:  payload.Username,
+		Email:     payload.Email,
 	}
 
 	if err := user.Password.Set(payload.Password); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
-
 	err := app.store.Users.Create(r.Context(), user)
 	if err != nil {
 		switch err {

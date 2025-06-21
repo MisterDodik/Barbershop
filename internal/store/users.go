@@ -15,6 +15,8 @@ var (
 
 type User struct {
 	ID         int64    `json:"id"`
+	FirstName  string   `json:"first_name"`
+	LastName   string   `json:"last_name"`
 	Username   string   `json:"username"`
 	Email      string   `json:"email"`
 	Password   password `json:"-"`
@@ -50,8 +52,8 @@ func (p *password) ComparePasswords(password string) bool {
 func (u *UserStorage) Create(ctx context.Context, user *User) error {
 	query :=
 		`
-		INSERT INTO users (username, email, password) 
-		VALUES ($1, $2, $3) RETURNING id, created_at
+		INSERT INTO users (username, first_name, last_name,  email, password) 
+		VALUES ($1, $2, $3, $4, $5) RETURNING id, created_at
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
@@ -59,6 +61,8 @@ func (u *UserStorage) Create(ctx context.Context, user *User) error {
 		ctx,
 		query,
 		user.Username,
+		user.FirstName,
+		user.LastName,
 		user.Email,
 		user.Password.hash,
 	).Scan(
@@ -80,7 +84,7 @@ func (u *UserStorage) Create(ctx context.Context, user *User) error {
 
 func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, error) {
 	query := `
-		SELECT id, email, username, password, created_at FROM users 
+		SELECT id, email, first_name, last_name, username, password, created_at FROM users 
 		WHERE email = $1
 	`
 
@@ -92,6 +96,8 @@ func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, erro
 	).Scan(
 		&user.ID,
 		&user.Email,
+		&user.FirstName,
+		&user.LastName,
 		&user.Username,
 		&user.Password.hash,
 		&user.Created_at,
@@ -110,7 +116,7 @@ func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, erro
 
 func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) {
 	query := `
-		SELECT id, email, username, password, created_at FROM users 
+		SELECT id, email, first_name, last_name, username, password, created_at FROM users 
 		WHERE id = $1
 	`
 
@@ -122,6 +128,8 @@ func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) 
 	).Scan(
 		&user.ID,
 		&user.Email,
+		&user.FirstName,
+		&user.LastName,
 		&user.Username,
 		&user.Password.hash,
 		&user.Created_at,
