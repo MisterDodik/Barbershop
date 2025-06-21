@@ -16,7 +16,8 @@ var (
 type Storage struct {
 	Users interface {
 		Create(context.Context, *User) error
-		GetByID(context.Context, int64) User
+		GetByID(context.Context, int64) (*User, error)
+		GetByEmail(context.Context, string) (*User, error)
 	}
 	TimeSlots interface {
 		GetFreeSlots(context.Context, time.Time) ([]TimeSlot, error)

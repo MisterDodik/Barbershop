@@ -40,6 +40,13 @@ func (p *password) Set(password string) error {
 	return nil
 }
 
+func (p *password) ComparePasswords(password string) bool {
+	if err := bcrypt.CompareHashAndPassword(p.hash, []byte(password)); err != nil {
+		return false
+	}
+	return true
+}
+
 func (u *UserStorage) Create(ctx context.Context, user *User) error {
 	query :=
 		`
@@ -70,7 +77,63 @@ func (u *UserStorage) Create(ctx context.Context, user *User) error {
 	}
 	return nil
 }
-func (u *UserStorage) GetByID(ctx context.Context, userID int64) User {
+
+func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, error) {
+	query := `
+		SELECT id, email, username, password, created_at FROM users 
+		WHERE email = $1
+	`
+
 	var user User
-	return user
+	err := u.db.QueryRowContext(
+		ctx,
+		query,
+		email,
+	).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Username,
+		&user.Password.hash,
+		&user.Created_at,
+	)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, Error_NotFound
+		default:
+			return nil, err
+		}
+	}
+	return &user, nil
+}
+
+func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) {
+	query := `
+		SELECT id, email, username, password, created_at FROM users 
+		WHERE id = $1
+	`
+
+	var user User
+	err := u.db.QueryRowContext(
+		ctx,
+		query,
+		userID,
+	).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Username,
+		&user.Password.hash,
+		&user.Created_at,
+	)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, Error_NotFound
+		default:
+			return nil, err
+		}
+	}
+	return &user, nil
 }
