@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-
+	"github.com/MisterDodik/Barbershop/internal/auth"
 	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -13,15 +13,28 @@ import (
 )
 
 type application struct {
-	config config
-	store  store.Storage
+	config        config
+	store         store.Storage
+	authenticator auth.Authenticator
 }
-
 type config struct {
 	addr string
 	db   dbConfig
+	auth authConfig
 }
-
+type authConfig struct {
+	basic basicConfig
+	token tokenConfig
+}
+type tokenConfig struct {
+	secret  string
+	expDate time.Duration
+	iss     string
+}
+type basicConfig struct { //moze za neke odredjene stranice, npr admin ili tako nesto
+	username string
+	password string
+}
 type dbConfig struct {
 	addr         string
 	maxOpenConns int
@@ -51,15 +64,19 @@ func (app *application) mount() http.Handler {
 		r.Get("/health", app.getHealthHandler)
 
 		r.Route("/appointment", func(r chi.Router) {
-			//authenticated endpoints
-
 			r.Post("/get_available_dates", app.getAvailableDates) //prilikom loadanja sajta uzeti da je selectedday = null, a to ce automatski biti danasnji dan
-			r.Post("/book/{slotID}", app.bookAppointment)
+
+			//authenticated endpoints
+			r.Route("/", func(r chi.Router) {
+				r.Use(app.TokenAuthMiddleware)
+
+				r.Post("/book/{slotID}", app.bookAppointment)
+			})
 		})
 
 		r.Route("/authentication", func(r chi.Router) {
 			r.Post("/user", app.registerUserHandler)
-			// r.Post("/token", app.createTokenHandler)
+			r.Post("/token", app.createTokenHandler)
 		})
 		// r.With(paginate).Get("/", listArticles)                           // GET /articles
 		// r.Get("/search", searchArticles)                                  // GET /articles/search
