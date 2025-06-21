@@ -71,6 +71,7 @@ func (app *application) mount() http.Handler {
 				r.Use(app.TokenAuthMiddleware)
 
 				r.Post("/book/{slotID}", app.bookAppointment)
+				r.Get("/my", app.getMyAppointments)
 			})
 		})
 
