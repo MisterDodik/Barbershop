@@ -1,0 +1,5 @@
+ALTER TABLE IF EXISTS users 
+DROP COLUMN first_name;
+
+ALTER TABLE IF EXISTS users 
+DROP COLUMN last_name;
