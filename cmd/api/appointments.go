@@ -29,8 +29,14 @@ func (app *application) getAvailableDates(w http.ResponseWriter, r *http.Request
 
 	slots, err := app.store.TimeSlots.GetFreeSlots(r.Context(), selectedDay)
 	if err != nil {
-		app.internalServerError(w, r, err)
-		return
+		switch err {
+		case store.Error_NotFound:
+			app.notFoundResponse(w, r, err)
+			return
+		default:
+			app.internalServerError(w, r, err)
+			return
+		}
 	}
 
 	if err := app.jsonResponse(w, http.StatusOK, slots); err != nil {
