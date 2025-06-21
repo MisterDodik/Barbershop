@@ -37,7 +37,7 @@ func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Ti
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			return nil, err //TODO dodaj mozda nesto drugo
+			return nil, Error_NotFound
 		default:
 			return nil, err
 		}
@@ -59,12 +59,58 @@ func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Ti
 	defer rows.Close()
 	return timeSlots, nil
 }
+func (s *TimeSlotsStorage) GetMyAppointments(ctx context.Context, userID int64) ([]TimeSlot, error) {
+	query := `
+		SELECT t.id, t.is_booked, t.start_time, u.id, u.username, u.email, u.first_name, u.last_name, u.created_at
+		FROM time_slots t
+		JOIN users u ON t.user_id = u.id
+		WHERE t.user_id = $1
+		ORDER BY t.start_time ASC
+		LIMIT 10
+	`
+	rows, err := s.db.QueryContext(
+		ctx,
+		query,
+		userID,
+	)
 
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, Error_NotFound
+		default:
+			return nil, err
+		}
+	}
+	var timeSlots []TimeSlot
+	for rows.Next() {
+		var slot TimeSlot
+		err := rows.Scan(
+			&slot.ID,
+			&slot.IsBooked,
+			&slot.StartTime,
+			&slot.User.ID,
+			&slot.User.Username,
+			&slot.User.Email,
+			&slot.User.FirstName,
+			&slot.User.LastName,
+			&slot.User.Created_at,
+		)
+		if err != nil {
+			return timeSlots, err
+		}
+		timeSlots = append(timeSlots, slot)
+	}
+
+	defer rows.Close()
+	return timeSlots, nil
+
+}
 func (s *TimeSlotsStorage) Book(ctx context.Context, slotID int64, userID int64) error {
 	query := `
 		UPDATE time_slots
 		SET is_booked = true, user_id = $2
-		WHERE id = $1
+		WHERE id = $1 AND is_booked = false
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
