@@ -82,6 +82,7 @@ func (app *application) mount() http.Handler {
 
 		r.Route("/admin", func(r chi.Router) {
 			r.Post("/get_calendar", app.getCalendarValues)
+			r.Post("/get_booked_dates", app.getBookedDates)
 		})
 	})
 

@@ -27,7 +27,7 @@ func (app *application) getAvailableDates(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	slots, err := app.store.TimeSlots.GetFreeSlots(r.Context(), selectedDay)
+	slots, err := app.store.TimeSlots.GetSlots(r.Context(), selectedDay, false)
 	if err != nil {
 		switch err {
 		case store.Error_NotFound:
