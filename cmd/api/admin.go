@@ -2,15 +2,25 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/MisterDodik/Barbershop/internal/store"
 )
 
 func (app *application) getCalendarValues(w http.ResponseWriter, r *http.Request) {
 
-	month := 1
+	var selectedDayPayload selectedDayPayload
+	if err := readJSON(w, r, &selectedDayPayload); err != nil {
+		selectedDayPayload.Day = time.Now().Format(time.DateOnly)
+	}
 
-	data, err := app.store.TimeSlots.GetBookedNumberForAMonth(r.Context(), month)
+	selectedDay, err := time.Parse(time.DateOnly, selectedDayPayload.Day)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+	_, month, _ := selectedDay.Date()
+	data, err := app.store.TimeSlots.GetBookedNumberForAMonth(r.Context(), int(month))
 
 	if err != nil {
 		switch err {
