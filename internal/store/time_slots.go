@@ -113,10 +113,11 @@ func (s *TimeSlotsStorage) GetMyAppointments(ctx context.Context, userID int64) 
 
 func (s *TimeSlotsStorage) GetBookedNumberForAMonth(ctx context.Context, month int) ([]NumberOfSlots, error) {
 	query := `
-		SELECT DATE(start_time), COUNT(*) AS booked_slots FROM time_slots 
+		SELECT DATE(start_time) as day, COUNT(*) AS booked_slots FROM time_slots 
 		WHERE is_booked = TRUE AND
 		EXTRACT(MONTH FROM start_time) = $1
 		GROUP BY DATE(start_time)
+		ORDER BY day;
 	`
 
 	rows, err := s.db.QueryContext(
