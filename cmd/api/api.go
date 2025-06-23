@@ -79,13 +79,10 @@ func (app *application) mount() http.Handler {
 			r.Post("/user", app.registerUserHandler)
 			r.Post("/token", app.createTokenHandler)
 		})
-		// r.With(paginate).Get("/", listArticles)                           // GET /articles
-		// r.Get("/search", searchArticles)                                  // GET /articles/search
-		// // Subrouters:
-		// r.Route("/{articleID}", func(r chi.Router) {
-		// 	//r.Use(ArticleCtx)
-		// 	//r.Get("/", getArticle)       // GET /articles/123
-		// })
+
+		r.Route("/admin", func(r chi.Router) {
+			r.Post("/get_calendar", app.getCalendarValues)
+		})
 	})
 
 	return r
