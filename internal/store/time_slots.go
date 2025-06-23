@@ -13,7 +13,11 @@ type TimeSlot struct {
 	ID        int64  `json:"id"`
 	IsBooked  bool   `json:"is_booked"`
 	StartTime string `json:"start_time"`
-	User      User   `json:"user"` //koristicu kad budem fetchovao zakazane termine za korisnika
+	User      User   `json:"user"`
+}
+type NumberOfSlots struct {
+	StartTime   string `json:"start_time"`
+	BookedSlots int    `json:"booked_slots"`
 }
 
 func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Time) ([]TimeSlot, error) {
@@ -106,6 +110,46 @@ func (s *TimeSlotsStorage) GetMyAppointments(ctx context.Context, userID int64) 
 	return timeSlots, nil
 
 }
+
+func (s *TimeSlotsStorage) GetBookedNumberForAMonth(ctx context.Context, month int) ([]NumberOfSlots, error) {
+	query := `
+		SELECT DATE(start_time), COUNT(*) AS booked_slots FROM time_slots 
+		WHERE is_booked = TRUE AND
+		EXTRACT(MONTH FROM start_time) = $1
+		GROUP BY DATE(start_time)
+	`
+
+	rows, err := s.db.QueryContext(
+		ctx,
+		query,
+		month,
+	)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, Error_NotFound
+		default:
+			return nil, err
+		}
+	}
+	var timeSlots []NumberOfSlots
+
+	for rows.Next() {
+		var slot NumberOfSlots
+		err := rows.Scan(
+			&slot.StartTime,
+			&slot.BookedSlots,
+		)
+		if err != nil {
+			return timeSlots, err
+		}
+		timeSlots = append(timeSlots, slot)
+	}
+
+	defer rows.Close()
+	return timeSlots, nil
+}
+
 func (s *TimeSlotsStorage) Book(ctx context.Context, slotID int64, userID int64) error {
 	query := `
 		UPDATE time_slots
