@@ -20,7 +20,7 @@ type NumberOfSlots struct {
 	BookedSlots int    `json:"booked_slots"`
 }
 
-func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Time) ([]TimeSlot, error) {
+func (s *TimeSlotsStorage) GetSlots(ctx context.Context, selectedDay time.Time, isBooked bool) ([]TimeSlot, error) {
 	year, month, day := selectedDay.Date()
 	start := time.Date(year, month, day, 0, 0, 0, 0, selectedDay.Location())
 	end := start.AddDate(0, 0, 1)
@@ -28,7 +28,7 @@ func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Ti
 	query :=
 		`
 			SELECT id, is_booked, start_time FROM time_slots 
-			WHERE is_booked = FALSE AND
+			WHERE is_booked = $3 AND
 			start_time >= $1::timestamp AND start_time < $2::timestamp;
 		`
 	rows, err := s.db.QueryContext(
@@ -36,6 +36,7 @@ func (s *TimeSlotsStorage) GetFreeSlots(ctx context.Context, selectedDay time.Ti
 		query,
 		start,
 		end,
+		isBooked,
 	)
 
 	if err != nil {
