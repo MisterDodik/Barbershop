@@ -21,6 +21,7 @@ type User struct {
 	Email      string   `json:"email"`
 	Password   password `json:"-"`
 	Created_at string   `json:"created_at"`
+	Role       string   `json:"role"`
 }
 type UserStorage struct {
 	db *sql.DB
@@ -52,8 +53,8 @@ func (p *password) ComparePasswords(password string) bool {
 func (u *UserStorage) Create(ctx context.Context, user *User) error {
 	query :=
 		`
-		INSERT INTO users (username, first_name, last_name,  email, password) 
-		VALUES ($1, $2, $3, $4, $5) RETURNING id, created_at
+		INSERT INTO users (username, first_name, last_name,  email, password, roles) 
+		VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, created_at
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
@@ -65,6 +66,7 @@ func (u *UserStorage) Create(ctx context.Context, user *User) error {
 		user.LastName,
 		user.Email,
 		user.Password.hash,
+		user.Role,
 	).Scan(
 		&user.ID,
 		&user.Created_at,
@@ -84,7 +86,7 @@ func (u *UserStorage) Create(ctx context.Context, user *User) error {
 
 func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, error) {
 	query := `
-		SELECT id, email, first_name, last_name, username, password, created_at FROM users 
+		SELECT id, email, first_name, last_name, username, password, created_at, roles FROM users 
 		WHERE email = $1
 	`
 
@@ -101,6 +103,7 @@ func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, erro
 		&user.Username,
 		&user.Password.hash,
 		&user.Created_at,
+		&user.Role,
 	)
 
 	if err != nil {
@@ -116,7 +119,7 @@ func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, erro
 
 func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) {
 	query := `
-		SELECT id, email, first_name, last_name, username, password, created_at FROM users 
+		SELECT id, email, first_name, last_name, username, password, created_at, roles FROM users 
 		WHERE id = $1
 	`
 
@@ -133,6 +136,7 @@ func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) 
 		&user.Username,
 		&user.Password.hash,
 		&user.Created_at,
+		&user.Role,
 	)
 
 	if err != nil {
