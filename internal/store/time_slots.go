@@ -28,12 +28,6 @@ func (s *TimeSlotsStorage) GetSlots(ctx context.Context, selectedDay time.Time, 
 	end := start.AddDate(0, 0, 1)
 
 	query :=
-		// `
-		// 	SELECT id, is_booked, start_time, worker_id FROM time_slots
-		// 	WHERE is_booked = $3 AND
-		// 	start_time >= $1::timestamp AND start_time < $2::timestamp AND
-		// 	worker_id = $4;
-		// `
 		`
 		SELECT 
 			t.id, t.is_booked, t.start_time,
