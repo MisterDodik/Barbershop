@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -19,8 +20,15 @@ func (app *application) getCalendarValues(w http.ResponseWriter, r *http.Request
 		app.internalServerError(w, r, err)
 		return
 	}
+	worker := getUserFromContext(r)
+	if worker == nil || worker.Role != "worker" {
+		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
+		return
+	}
+	workerID := worker.ID
+
 	_, month, _ := selectedDay.Date()
-	data, err := app.store.TimeSlots.GetBookedNumberForAMonth(r.Context(), int(month))
+	data, err := app.store.TimeSlots.GetBookedNumberForAMonth(r.Context(), int(month), workerID)
 
 	if err != nil {
 		switch err {
@@ -52,7 +60,14 @@ func (app *application) getBookedDates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slots, err := app.store.TimeSlots.GetSlots(r.Context(), selectedDay, true)
+	worker := getUserFromContext(r)
+	if worker == nil || worker.Role != "worker" {
+		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
+		return
+	}
+	workerID := worker.ID
+
+	slots, err := app.store.TimeSlots.GetSlots(r.Context(), selectedDay, workerID, true)
 	if err != nil {
 		switch err {
 		case store.Error_NotFound:
