@@ -11,7 +11,8 @@ import (
 )
 
 type selectedDayPayload struct {
-	Day string `json:"day"`
+	Day      string `json:"day"`
+	WorkerID int64  `json:"worker_id"`
 }
 
 // ako se u body json ne stavi nista, onda ce automatski uzeti danasnji dan
@@ -27,7 +28,7 @@ func (app *application) getAvailableDates(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	slots, err := app.store.TimeSlots.GetSlots(r.Context(), selectedDay, false)
+	slots, err := app.store.TimeSlots.GetSlots(r.Context(), selectedDay, selectedDayPayload.WorkerID, false)
 	if err != nil {
 		switch err {
 		case store.Error_NotFound:
@@ -53,13 +54,21 @@ func (app *application) bookAppointment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	workerIDstr := chi.URLParam(r, "workerID")
+	workerID, err := strconv.ParseInt(workerIDstr, 10, 64)
+
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
 	user := getUserFromContext(r)
 	if user == nil {
 		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you are not logged in"))
 		return
 	}
 
-	if err := app.store.TimeSlots.Book(r.Context(), slotID, user.ID); err != nil {
+	if err := app.store.TimeSlots.Book(r.Context(), slotID, workerID, user.ID); err != nil {
 		switch err {
 		case store.Error_NotFound:
 			app.notFoundResponse(w, r, err)
