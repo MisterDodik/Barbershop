@@ -70,7 +70,7 @@ func (app *application) mount() http.Handler {
 			r.Route("/", func(r chi.Router) {
 				r.Use(app.TokenAuthMiddleware)
 
-				r.Post("/book/{slotID}", app.bookAppointment)
+				r.Post("/book/{workerID}/{slotID}", app.bookAppointment)
 				r.Get("/my", app.getMyAppointments)
 			})
 		})
@@ -80,7 +80,10 @@ func (app *application) mount() http.Handler {
 			r.Post("/token", app.createTokenHandler)
 		})
 
+		//authenticated endpoints
 		r.Route("/admin", func(r chi.Router) {
+			r.Use(app.TokenAuthMiddleware)
+
 			r.Post("/get_calendar", app.getCalendarValues)
 			r.Post("/get_booked_dates", app.getBookedDates)
 		})
