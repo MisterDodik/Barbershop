@@ -135,6 +135,7 @@ func (s *TimeSlotsStorage) GetMyAppointments(ctx context.Context, userID int64) 
 	var timeSlots []TimeSlot
 	for rows.Next() {
 		var slot TimeSlot
+		slot.User = &User{}
 		err := rows.Scan(
 			&slot.ID,
 			&slot.IsBooked,
