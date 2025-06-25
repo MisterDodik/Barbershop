@@ -20,10 +20,10 @@ type Storage struct {
 		GetByEmail(context.Context, string) (*User, error)
 	}
 	TimeSlots interface {
-		GetSlots(context.Context, time.Time, bool) ([]TimeSlot, error)
+		GetSlots(context.Context, time.Time, int64, bool) ([]TimeSlot, error)
 		GetMyAppointments(context.Context, int64) ([]TimeSlot, error)
-		GetBookedNumberForAMonth(context.Context, int) ([]NumberOfSlots, error)
-		Book(context.Context, int64, int64) error
+		GetBookedNumberForAMonth(context.Context, int, int64) ([]NumberOfSlots, error)
+		Book(context.Context, int64, int64, int64) error
 	}
 }
 
