@@ -1,0 +1,3 @@
+ALTER TABLE IF EXISTS time_slots
+ADD COLUMN worker_id BIGINT,
+ADD CONSTRAINT fk_worker FOREIGN KEY (worker_id) REFERENCES users(id) ON DELETE SET NULL;
