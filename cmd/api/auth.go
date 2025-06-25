@@ -15,6 +15,7 @@ type UserPayload struct {
 	Username  string `json:"username" validate:"required,max=100"`
 	Email     string `json:"email" validate:"required,email,max=255"`
 	Password  string `json:"password" validate:"required,min=3,max=72"`
+	Role      string `json:"role" validate:"omitempty,oneof=customer worker"`
 }
 
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +27,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 
 	if err := Validate.Struct(payload); err != nil {
 		app.badRequestResponse(w, r, err)
+		return
 	}
 
 	user := &store.User{
@@ -33,6 +35,10 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		LastName:  payload.LastName,
 		Username:  payload.Username,
 		Email:     payload.Email,
+		Role:      "customer",
+	}
+	if payload.Role == "worker" {
+		user.Role = "worker"
 	}
 
 	if err := user.Password.Set(payload.Password); err != nil {
