@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS time_slots 
+ADD COLUMN duration INTERVAL NOT NULL DEFAULT '30 minutes';
