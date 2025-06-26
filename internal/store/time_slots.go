@@ -234,3 +234,11 @@ func (s *TimeSlotsStorage) Book(ctx context.Context, slotID, workerID, userID in
 	}
 	return nil
 }
+
+func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context) error {
+	// query := `
+
+	// `
+
+	return nil
+}
