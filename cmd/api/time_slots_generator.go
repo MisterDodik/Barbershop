@@ -33,14 +33,7 @@ func (app *application) GenerateSlots(w http.ResponseWriter, r *http.Request) {
 		daysToGenerate = 7
 	}
 
-	timeStamps := parseWorkingHours(settings.WorkingHours, settings.AppointmentDuration, settings.PauseBetween, daysToGenerate)
-	for _, j := range timeStamps {
-		err := app.store.TimeSlots.CreateNewSlot(ctx, workerID, j, settings.AppointmentDuration)
-
-		if err != nil {
-			app.internalServerError(w, r, err)
-		}
-	}
+	app.parseWorkingHours(w, r, workerID, settings.WorkingHours, settings.AppointmentDuration, settings.PauseBetween, daysToGenerate)
 
 	if err := app.jsonResponse(w, http.StatusOK, "successfully created slots"); err != nil {
 		app.internalServerError(w, r, err)
@@ -48,9 +41,7 @@ func (app *application) GenerateSlots(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func parseWorkingHours(data map[string]string, duration, pause time.Duration, daysAhead int) []time.Time {
-	var times []time.Time
-
+func (app *application) parseWorkingHours(w http.ResponseWriter, r *http.Request, workerID int64, data map[string]string, duration, pause time.Duration, daysAhead int) {
 	days := []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}
 	todayDay := time.Now().Weekday()
 
@@ -83,27 +74,53 @@ func parseWorkingHours(data map[string]string, duration, pause time.Duration, da
 		startTime, err := time.Parse("15:04", splitTimes[0])
 		if err != nil {
 			log.Printf("cant convert startTime %v to time.Time", splitTimes[0])
-			return nil
+			return
 		}
 		endTime, err := time.Parse("15:04", splitTimes[1])
 		if err != nil {
 			log.Printf("cant convert endTime %v to time.Time", splitTimes[1])
-			return nil
+			return
 		}
 
 		//"2025-07-02 09:30:00"
-		for startTime.Compare(endTime) <= 0 {
+		for timeOnlyLessOrEqual(startTime, endTime) {
 			appointment, err := time.Parse(time.DateTime, fmt.Sprintf("%v %v", currentDate.Format(time.DateOnly), startTime.Format(time.TimeOnly)))
 			if err != nil {
 				fmt.Print(err)
 				break
 			}
-			times = append(times, appointment)
 
+			newTime, err := app.store.TimeSlots.CreateNewSlot(r.Context(), workerID, appointment, duration)
+			if err != nil {
+				app.internalServerError(w, r, err)
+				return
+			}
+			if newTime != nil {
+				//conflict: try next available time
+				startTime = newTime.Add(pause)
+				continue
+			}
 			startTime = startTime.Add(duration + pause)
 		}
 		currentDate = currentDate.AddDate(0, 0, 1)
 	}
+}
 
-	return times
+func timeOnlyLessOrEqual(t1, t2 time.Time) bool {
+	h1, m1, s1 := t1.Clock()
+	h2, m2, s2 := t2.Clock()
+
+	if h1 < h2 {
+		return true
+	}
+	if h1 > h2 {
+		return false
+	}
+	if m1 < m2 {
+		return true
+	}
+	if m1 > m2 {
+		return false
+	}
+	return s1 <= s2
 }
