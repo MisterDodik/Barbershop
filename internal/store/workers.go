@@ -11,8 +11,8 @@ import (
 type WorkerProfile struct {
 	UserID              int64             `json:"user_id"`
 	WorkingHours        map[string]string `json:"working_hours"`
-	AppointmentDuration time.Duration     `json:"appointment_duration"`
-	PauseBetween        time.Duration     `json:"pause_between"`
+	AppointmentDuration time.Duration     `json:"appointment_duration,string"`
+	PauseBetween        time.Duration     `json:"pause_between,string"`
 }
 
 type WorkerProfileStorage struct {
@@ -101,5 +101,5 @@ func parsePgIntervalToMinutes(pg string) (time.Duration, error) {
 		return 0, err
 	}
 	totalMinutes := t.Hour()*60 + t.Minute()
-	return time.Duration((time.Duration(totalMinutes) * time.Minute).Minutes()), nil
+	return time.Duration(totalMinutes) * time.Minute, nil
 }
