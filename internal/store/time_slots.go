@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -237,8 +236,37 @@ func (s *TimeSlotsStorage) Book(ctx context.Context, slotID, workerID, userID in
 	return nil
 }
 
-func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, timeStamp time.Time, duration time.Duration) error {
+func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, timeStamp time.Time, duration time.Duration) (*time.Time, error) {
+
+	//checking for overlap and suggesting a valid timestamp
 	query := `
+		SELECT MAX(start_time + duration) AS latest_end_time
+		FROM time_slots 
+		WHERE worker_id = $2
+		  AND start_time < $1::timestamp + $3 ::interval
+		  AND start_time + duration > $1::timestamp;
+	`
+	intervalStr := fmt.Sprintf("%.0f minutes", duration.Minutes())
+	var newTimeToTry *time.Time
+	err := s.db.QueryRowContext(
+		ctx,
+		query,
+		timeStamp,
+		workerID,
+		intervalStr,
+	).Scan(
+		&newTimeToTry,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if newTimeToTry != nil {
+		return newTimeToTry, nil
+	}
+
+	//inserting into the database but checking once again if it overlaps just in case (not necessary)
+	query = `
 		INSERT INTO time_slots (start_time, worker_id, duration)
 		SELECT $1::timestamp, $2, $3 ::interval
 		WHERE NOT EXISTS (
@@ -248,9 +276,7 @@ func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, ti
       		AND start_time + duration > $1::timestamp
 		);
 	`
-	intervalStr := fmt.Sprintf("%.0f minutes", duration.Minutes())
-	log.Print(workerID, timeStamp, intervalStr)
-	_, err := s.db.ExecContext(
+	_, err = s.db.ExecContext(
 		ctx,
 		query,
 		timeStamp,
@@ -259,8 +285,8 @@ func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, ti
 	)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return nil, nil
 }
