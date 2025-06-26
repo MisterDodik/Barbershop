@@ -86,6 +86,9 @@ func (app *application) mount() http.Handler {
 
 			r.Post("/get_calendar", app.getCalendarValues)
 			r.Post("/get_booked_dates", app.getBookedDates)
+
+			r.Get("/get_work_settings", app.getWorkSettings)
+			r.Post("/update_work_settings", app.updateWorkSettings)
 		})
 	})
 
