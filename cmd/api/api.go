@@ -89,6 +89,9 @@ func (app *application) mount() http.Handler {
 
 			r.Get("/get_work_settings", app.getWorkSettings)
 			r.Post("/update_work_settings", app.updateWorkSettings)
+
+			r.Post("/generate_slots/{daysCount}", app.GenerateSlots) //daysCount: koliko dana unaprijed ce generisati
+			r.Post("/generate_slots", app.GenerateSlots)             //samo da ako se nista ne stavi da uzme vrijednost npr 7
 		})
 	})
 
