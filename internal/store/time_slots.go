@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
 	"time"
 )
 
@@ -235,10 +237,30 @@ func (s *TimeSlotsStorage) Book(ctx context.Context, slotID, workerID, userID in
 	return nil
 }
 
-func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context) error {
-	// query := `
+func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, timeStamp time.Time, duration time.Duration) error {
+	query := `
+		INSERT INTO time_slots (start_time, worker_id, duration)
+		SELECT $1::timestamp, $2, $3 ::interval
+		WHERE NOT EXISTS (
+			SELECT 1 FROM time_slots 
+			WHERE worker_id = $2
+			AND start_time < $1::timestamp + $3 ::interval
+      		AND start_time + duration > $1::timestamp
+		);
+	`
+	intervalStr := fmt.Sprintf("%.0f minutes", duration.Minutes())
+	log.Print(workerID, timeStamp, intervalStr)
+	_, err := s.db.ExecContext(
+		ctx,
+		query,
+		timeStamp,
+		workerID,
+		intervalStr,
+	)
 
-	// `
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
