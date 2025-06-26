@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -86,7 +87,7 @@ func (app *application) getBookedDates(w http.ResponseWriter, r *http.Request) {
 
 type WorkSettingsPayload struct {
 	WorkingHours        map[string]string `json:"working_hours" validate:"required,dive,keys,required,endkeys"`
-	AppointmentDuration int               `json:"appointment_duration" validate:"required"`
+	AppointmentDuration int               `json:"appointment_duration" validate:"required,gt=0"`
 	PauseBetween        int               `json:"pause_between" validate:"required"`
 }
 
@@ -124,6 +125,14 @@ func (app *application) updateWorkSettings(w http.ResponseWriter, r *http.Reques
 		return
 	}
 }
+
+type WorkerProfileResponse struct {
+	UserID              int64             `json:"user_id"`
+	WorkingHours        map[string]string `json:"working_hours"`
+	AppointmentDuration int               `json:"appointment_duration"`
+	PauseBetween        int               `json:"pause_between"`
+}
+
 func (app *application) getWorkSettings(w http.ResponseWriter, r *http.Request) {
 	worker := getUserFromContext(r)
 	if worker == nil || worker.Role != "worker" {
@@ -143,8 +152,15 @@ func (app *application) getWorkSettings(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
+	response := WorkerProfileResponse{
+		UserID:              settings.UserID,
+		WorkingHours:        settings.WorkingHours,
+		AppointmentDuration: int(settings.AppointmentDuration.Minutes()),
+		PauseBetween:        int(settings.PauseBetween.Minutes()),
+	}
+	log.Print(settings.AppointmentDuration.Minutes())
 
-	if err := app.jsonResponse(w, http.StatusOK, settings); err != nil {
+	if err := app.jsonResponse(w, http.StatusOK, response); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
