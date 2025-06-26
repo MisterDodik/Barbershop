@@ -25,11 +25,16 @@ type Storage struct {
 		GetBookedNumberForAMonth(context.Context, int, int64) ([]NumberOfSlots, error)
 		Book(context.Context, int64, int64, int64) error
 	}
+	Workers interface {
+		CreateOrUpdateSettings(context.Context, int64, map[string]string, int, int) error
+		GetSettings(context.Context, int64) (*WorkerProfile, error)
+	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
 		Users:     &UserStorage{db},
 		TimeSlots: &TimeSlotsStorage{db},
+		Workers:   &WorkerProfileStorage{db},
 	}
 }
