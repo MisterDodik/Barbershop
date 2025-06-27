@@ -57,7 +57,9 @@ func (app *application) parseWorkingHours(ctx context.Context, workerID int64, w
 		startingIndex = (startingIndex + 1) % len(days)
 
 		timeRange, ok := workingHours[currentDay] //radni sati
+		log.Print(ok, workingHours[currentDay], currentDay)
 		if !ok {
+			currentDate = currentDate.AddDate(0, 0, 1)
 			i--
 			continue
 		}
@@ -97,7 +99,7 @@ func getTodayIndex(days []string) int {
 			return i
 		}
 	}
-	return 0
+	return -1
 }
 
 func parseTimeRange(timeRange string) (startTime, endTime time.Time, err error) {
