@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -33,7 +34,11 @@ func (app *application) GenerateSlots(w http.ResponseWriter, r *http.Request) {
 		daysToGenerate = 7
 	}
 
-	app.parseWorkingHours(w, r, workerID, settings.WorkingHours, settings.AppointmentDuration, settings.PauseBetween, daysToGenerate)
+	err = app.parseWorkingHours(ctx, workerID, settings.WorkingHours, settings.AppointmentDuration, settings.PauseBetween, daysToGenerate)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
 
 	if err := app.jsonResponse(w, http.StatusOK, "successfully created slots"); err != nil {
 		app.internalServerError(w, r, err)
@@ -41,59 +46,38 @@ func (app *application) GenerateSlots(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) parseWorkingHours(w http.ResponseWriter, r *http.Request, workerID int64, data map[string]string, duration, pause time.Duration, daysAhead int) {
+func (app *application) parseWorkingHours(ctx context.Context, workerID int64, workingHours map[string]string, duration, pause time.Duration, daysAhead int) error {
 	days := []string{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"}
-	todayDay := time.Now().Weekday()
 
-	startingIndex := 0
-	todayString := strings.ToLower(todayDay.String())
-	for i, day := range days {
-		if day == todayString {
-			startingIndex = i
-			break
-		}
-	}
+	startingIndex := getTodayIndex(days)
 
 	currentDate := time.Now()
 	for i := 0; i < daysAhead; i++ {
 		currentDay := days[startingIndex]
-
-		timeRange, ok := data[currentDay] //radni sati
 		startingIndex = (startingIndex + 1) % len(days)
+
+		timeRange, ok := workingHours[currentDay] //radni sati
 		if !ok {
 			i--
 			continue
 		}
-		splitTimes := strings.Split(timeRange, "-") // pocetak i kraj radnog vremena
 
-		if len(splitTimes) != 2 {
-			log.Printf("splitTimes %v has %v elements. Expected 2", splitTimes, len(splitTimes))
-			currentDate = currentDate.AddDate(0, 0, 1)
+		startTime, endTime, err := parseTimeRange(timeRange)
+		if err != nil {
+			log.Printf("invalid time range %q for %s: %v", timeRange, currentDay, err)
 			continue
-		}
-		startTime, err := time.Parse("15:04", splitTimes[0])
-		if err != nil {
-			log.Printf("cant convert startTime %v to time.Time", splitTimes[0])
-			return
-		}
-		endTime, err := time.Parse("15:04", splitTimes[1])
-		if err != nil {
-			log.Printf("cant convert endTime %v to time.Time", splitTimes[1])
-			return
 		}
 
 		//"2025-07-02 09:30:00"
 		for timeOnlyLessOrEqual(startTime, endTime) {
 			appointment, err := time.Parse(time.DateTime, fmt.Sprintf("%v %v", currentDate.Format(time.DateOnly), startTime.Format(time.TimeOnly)))
 			if err != nil {
-				fmt.Print(err)
-				break
+				return err
 			}
 
-			newTime, err := app.store.TimeSlots.CreateNewSlot(r.Context(), workerID, appointment, duration)
+			newTime, err := app.store.TimeSlots.CreateNewSlot(ctx, workerID, appointment, duration)
 			if err != nil {
-				app.internalServerError(w, r, err)
-				return
+				return err
 			}
 			if newTime != nil {
 				//conflict: try next available time
@@ -104,6 +88,30 @@ func (app *application) parseWorkingHours(w http.ResponseWriter, r *http.Request
 		}
 		currentDate = currentDate.AddDate(0, 0, 1)
 	}
+	return nil
+}
+func getTodayIndex(days []string) int {
+	todayString := strings.ToLower(time.Now().Weekday().String())
+	for i, day := range days {
+		if day == todayString {
+			return i
+		}
+	}
+	return 0
+}
+
+func parseTimeRange(timeRange string) (startTime, endTime time.Time, err error) {
+	parts := strings.Split(timeRange, "-")
+	if len(parts) != 2 {
+		return startTime, endTime, fmt.Errorf("expected 2 parts but got %d", len(parts))
+	}
+
+	startTime, err = time.Parse("15:04", parts[0])
+	if err != nil {
+		return
+	}
+	endTime, err = time.Parse("15:04", parts[1])
+	return
 }
 
 func timeOnlyLessOrEqual(t1, t2 time.Time) bool {
