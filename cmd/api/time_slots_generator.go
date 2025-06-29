@@ -9,17 +9,87 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/go-chi/chi/v5"
 )
+
+type CustomSlotPayload struct {
+	StartTime           string `json:"start_time" validate:"required"`
+	AppointmentDuration string `json:"appointment_duration" validate:"required"`
+}
+
+func (app *application) RemoveSlot(w http.ResponseWriter, r *http.Request) {
+	slotIDstr := chi.URLParam(r, "slotID")
+	slotID, err := strconv.ParseInt(slotIDstr, 10, 64)
+
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	err = app.store.TimeSlots.RemoveSlot(r.Context(), slotID)
+	if err != nil {
+		switch err {
+		case store.Error_NotFound:
+			app.notFoundResponse(w, r, fmt.Errorf("no changes have been made"))
+			return
+		default:
+			app.internalServerError(w, r, err)
+			return
+		}
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, "slot removed"); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
+func (app *application) AddCustomSlot(w http.ResponseWriter, r *http.Request) {
+	var payload CustomSlotPayload
+	if err := readJSON(w, r, &payload); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+	if err := Validate.Struct(payload); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	startTime, err := time.Parse(time.DateTime, payload.StartTime)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+	duration, err := time.ParseDuration(payload.AppointmentDuration)
+
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	worker := getUserFromContext(r)
+	workerID := worker.ID
+
+	closestAvailable, err := app.store.TimeSlots.CreateNewSlot(r.Context(), workerID, startTime, duration)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+	if closestAvailable != nil {
+		app.conflictResponse(w, r, fmt.Errorf("unable to add a new slot, but it would overlap with an existing one"))
+		return
+	}
+
+	if err := app.jsonResponse(w, http.StatusCreated, "database updated"); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
 
 func (app *application) GenerateSlots(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	worker := getUserFromContext(r)
-	if worker == nil || worker.Role != "worker" {
-		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
-		return
-	}
 	workerID := worker.ID
 
 	settings, err := app.store.Workers.GetSettings(ctx, workerID)
