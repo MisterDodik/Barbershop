@@ -25,6 +25,7 @@ type Storage struct {
 		GetBookedNumberForAMonth(context.Context, int, int64) ([]NumberOfSlots, error)
 		Book(context.Context, int64, int64, int64) error
 		CreateNewSlot(context.Context, int64, time.Time, time.Duration) (*time.Time, error)
+		RemoveSlot(context.Context, int64) error
 	}
 	Workers interface {
 		CreateOrUpdateSettings(context.Context, int64, map[string]string, int, int) error
