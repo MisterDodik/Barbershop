@@ -72,6 +72,8 @@ func (app *application) mount() http.Handler {
 
 				r.Post("/book/{workerID}/{slotID}", app.bookAppointment)
 				r.Get("/my", app.getMyAppointments)
+
+				r.Post("/cancel_appointment/{slotID}", app.cancelAppointment)
 			})
 		})
 
@@ -97,6 +99,8 @@ func (app *application) mount() http.Handler {
 			r.Post("/add_custom_slot", app.AddCustomSlot)
 			r.Post("/remove_slot/{slotID}", app.RemoveSlot)         //uklanja slobodni termin
 			r.Post("/bookForSomeone/{slotID}", app.bookAppointment) //mogu poslati neki payload za tog customera al aj vidjecu
+
+			r.Post("/change_appointment_status", app.changeAppointmentStatus)
 		})
 	})
 
