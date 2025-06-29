@@ -152,3 +152,38 @@ func (app *application) getWorkSettings(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 }
+
+type AppointmentStatusPayload struct {
+	SlotID int64  `json:"slot_id" validate:"required"`
+	Status string `json:"status" validate:"required,oneof=booked available missed completed"`
+}
+
+func (app *application) changeAppointmentStatus(w http.ResponseWriter, r *http.Request) {
+	var payload AppointmentStatusPayload
+
+	if err := readJSON(w, r, &payload); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	if err := Validate.Struct(payload); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	if err := app.store.TimeSlots.UpdateStatus(r.Context(), payload.SlotID, payload.Status, nil); err != nil {
+		switch err {
+		case store.Error_NotFound:
+			app.notFoundResponse(w, r, err)
+			return
+		default:
+			app.internalServerError(w, r, err)
+			return
+		}
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, "status updated"); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
