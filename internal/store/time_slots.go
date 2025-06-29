@@ -237,6 +237,8 @@ func (s *TimeSlotsStorage) Book(ctx context.Context, slotID, workerID, userID in
 }
 
 func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, timeStamp time.Time, duration time.Duration) (*time.Time, error) {
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 
 	//checking for overlap and suggesting a valid timestamp
 	query := `
@@ -289,4 +291,26 @@ func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, ti
 	}
 
 	return nil, nil
+}
+
+func (s *TimeSlotsStorage) RemoveSlot(ctx context.Context, slotID int64) error {
+	query := `
+		DELETE FROM time_slots WHERE id = $1 AND is_booked=FALSE;
+	`
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := s.db.ExecContext(ctx, query, slotID)
+
+	if err != nil {
+		return nil
+	}
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return nil
+	}
+	if rowsAffected == 0 {
+		return Error_NotFound
+	}
+	return nil
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type WorkerProfile struct {
-	UserID              int64             `json:"user_id"`
+	WorkerID            int64             `json:"worker_id"`
 	WorkingHours        map[string]string `json:"working_hours"`
 	AppointmentDuration time.Duration     `json:"appointment_duration,string"`
 	PauseBetween        time.Duration     `json:"pause_between,string"`
@@ -66,7 +66,7 @@ func (p *WorkerProfileStorage) GetSettings(ctx context.Context, workerID int64) 
 		query,
 		workerID,
 	).Scan(
-		&settings.UserID,
+		&settings.WorkerID,
 		&rawJSON,
 		&rawDuration,
 		&rawPause,
