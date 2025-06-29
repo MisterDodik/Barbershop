@@ -15,6 +15,7 @@ type TimeSlot struct {
 	IsBooked        bool   `json:"is_booked"`
 	StartTime       string `json:"start_time"`
 	User            *User  `json:"user,omitempty"`
+	Status          string `json:"status"`
 	WorkerID        int64  `json:"worker_id"`
 	WorkerFirstName string `json:"worker_first_name"`
 }
@@ -31,7 +32,7 @@ func (s *TimeSlotsStorage) GetSlots(ctx context.Context, selectedDay time.Time, 
 	query :=
 		`
 		SELECT 
-			t.id, t.is_booked, t.start_time,
+			t.id, t.is_booked, t.start_time, t.status,
 			c.id, c.first_name, c.last_name, c.email,
 			w.id, w.first_name
 		FROM time_slots t
@@ -70,6 +71,7 @@ func (s *TimeSlotsStorage) GetSlots(ctx context.Context, selectedDay time.Time, 
 			&slot.ID,
 			&slot.IsBooked,
 			&slot.StartTime,
+			&slot.Status,
 			&userID,
 			&firstName,
 			&lastName,
@@ -101,7 +103,7 @@ func (s *TimeSlotsStorage) GetSlots(ctx context.Context, selectedDay time.Time, 
 func (s *TimeSlotsStorage) GetMyAppointments(ctx context.Context, userID int64) ([]TimeSlot, error) {
 	query := `
 		SELECT 	
-			t.id, t.is_booked, t.start_time, 		
+			t.id, t.is_booked, t.start_time, t.status,		
 			customer.id AS customer_id,
 			customer.username AS customer_username,
 			customer.email AS customer_email,
@@ -141,6 +143,7 @@ func (s *TimeSlotsStorage) GetMyAppointments(ctx context.Context, userID int64) 
 			&slot.ID,
 			&slot.IsBooked,
 			&slot.StartTime,
+			&slot.Status,
 			&slot.User.ID,
 			&slot.User.Username,
 			&slot.User.Email,
@@ -167,7 +170,7 @@ func (s *TimeSlotsStorage) GetBookedNumberForAMonth(ctx context.Context, month i
 		SELECT DATE(start_time) as day, COUNT(*) AS booked_slots FROM time_slots 
 		WHERE is_booked = TRUE AND
 		EXTRACT(MONTH FROM start_time) = $1 AND
-		worker_id = $2
+		worker_id = $2 AND status = 'booked'
 		GROUP BY DATE(start_time)
 		ORDER BY day;
 	`
@@ -207,7 +210,7 @@ func (s *TimeSlotsStorage) GetBookedNumberForAMonth(ctx context.Context, month i
 func (s *TimeSlotsStorage) Book(ctx context.Context, slotID, workerID, userID int64) error {
 	query := `
 		UPDATE time_slots
-		SET is_booked = true, user_id = $2
+		SET is_booked = true, user_id = $2, status = 'booked'
 		WHERE id = $1 AND worker_id = $3 AND is_booked = false
 	`
 	//TODO mzd u ovom query treba izbaciti ovo worker_id mzd je double checking bez razloga al aj
@@ -301,6 +304,46 @@ func (s *TimeSlotsStorage) RemoveSlot(ctx context.Context, slotID int64) error {
 	defer cancel()
 
 	rows, err := s.db.ExecContext(ctx, query, slotID)
+
+	if err != nil {
+		return nil
+	}
+	rowsAffected, err := rows.RowsAffected()
+	if err != nil {
+		return nil
+	}
+	if rowsAffected == 0 {
+		return Error_NotFound
+	}
+	return nil
+}
+
+func (s *TimeSlotsStorage) UpdateStatus(ctx context.Context, slotID int64, newStatus string, userID *int64) error {
+	query := `
+		UPDATE time_slots
+		SET status = $1
+	`
+	args := []interface{}{newStatus}
+
+	if newStatus == "available" {
+		query += `, is_booked = FALSE, user_id = NULL`
+	}
+
+	query += `
+		WHERE id = $2 AND is_booked = TRUE`
+	args = append(args, slotID)
+
+	if userID != nil {
+		query += ` AND user_id = $3 AND status = 'booked'`
+		args = append(args, *userID)
+	}
+
+	//TODO mogu dodati da se moze promijeniti samo ako je status = 'booked', ali ne moram (makar za admina)
+	rows, err := s.db.ExecContext(
+		ctx,
+		query,
+		args...,
+	)
 
 	if err != nil {
 		return nil
