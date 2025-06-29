@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS time_slots 
+ADD COLUMN status VARCHAR(255) NOT NULL DEFAULT 'available';
