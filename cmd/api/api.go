@@ -83,6 +83,7 @@ func (app *application) mount() http.Handler {
 		//authenticated endpoints
 		r.Route("/admin", func(r chi.Router) {
 			r.Use(app.TokenAuthMiddleware)
+			r.Use(app.AdminAuthMiddleware)
 
 			r.Post("/get_calendar", app.getCalendarValues)
 			r.Post("/get_booked_dates", app.getBookedDates)
@@ -92,6 +93,10 @@ func (app *application) mount() http.Handler {
 
 			r.Post("/generate_slots/{daysCount}", app.GenerateSlots) //daysCount: koliko dana unaprijed ce generisati
 			r.Post("/generate_slots", app.GenerateSlots)             //samo da ako se nista ne stavi da uzme vrijednost npr 7
+
+			r.Post("/add_custom_slot", app.AddCustomSlot)
+			r.Post("/remove_slot/{slotID}", app.RemoveSlot)         //uklanja slobodni termin
+			r.Post("/bookForSomeone/{slotID}", app.bookAppointment) //mogu poslati neki payload za tog customera al aj vidjecu
 		})
 	})
 
