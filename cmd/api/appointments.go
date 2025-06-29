@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -54,18 +53,18 @@ func (app *application) bookAppointment(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	workerIDstr := chi.URLParam(r, "workerID")
-	workerID, err := strconv.ParseInt(workerIDstr, 10, 64)
-
-	if err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}
-
 	user := getUserFromContext(r)
-	if user == nil {
-		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you are not logged in"))
-		return
+	var workerID int64
+	if user.Role != "worker" {
+		workerIDstr := chi.URLParam(r, "workerID")
+		workerID, err = strconv.ParseInt(workerIDstr, 10, 64)
+
+		if err != nil {
+			app.badRequestResponse(w, r, err)
+			return
+		}
+	} else {
+		workerID = user.ID
 	}
 
 	if err := app.store.TimeSlots.Book(r.Context(), slotID, workerID, user.ID); err != nil {
