@@ -53,3 +53,15 @@ func (app *application) TokenAuthMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+
+func (app *application) AdminAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		worker := getUserFromContext(r)
+		if worker == nil || worker.Role != "worker" {
+			app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}

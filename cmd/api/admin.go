@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -22,10 +21,7 @@ func (app *application) getCalendarValues(w http.ResponseWriter, r *http.Request
 		return
 	}
 	worker := getUserFromContext(r)
-	if worker == nil || worker.Role != "worker" {
-		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
-		return
-	}
+
 	workerID := worker.ID
 
 	_, month, _ := selectedDay.Date()
@@ -62,10 +58,7 @@ func (app *application) getBookedDates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	worker := getUserFromContext(r)
-	if worker == nil || worker.Role != "worker" {
-		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
-		return
-	}
+
 	workerID := worker.ID
 
 	slots, err := app.store.TimeSlots.GetSlots(r.Context(), selectedDay, workerID, true)
@@ -105,10 +98,7 @@ func (app *application) updateWorkSettings(w http.ResponseWriter, r *http.Reques
 	}
 
 	worker := getUserFromContext(r)
-	if worker == nil || worker.Role != "worker" {
-		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
-		return
-	}
+
 	workerID := worker.ID
 
 	if err := app.store.Workers.CreateOrUpdateSettings(r.Context(),
@@ -135,10 +125,7 @@ type WorkerProfileResponse struct {
 
 func (app *application) getWorkSettings(w http.ResponseWriter, r *http.Request) {
 	worker := getUserFromContext(r)
-	if worker == nil || worker.Role != "worker" {
-		app.unauthorizedErrorResponse(w, r, fmt.Errorf("you dont have permissions to access this"))
-		return
-	}
+
 	workerID := worker.ID
 
 	settings, err := app.store.Workers.GetSettings(r.Context(), workerID)
@@ -153,7 +140,7 @@ func (app *application) getWorkSettings(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 	response := WorkerProfileResponse{
-		UserID:              settings.UserID,
+		UserID:              settings.WorkerID,
 		WorkingHours:        settings.WorkingHours,
 		AppointmentDuration: int(settings.AppointmentDuration.Minutes()),
 		PauseBetween:        int(settings.PauseBetween.Minutes()),
