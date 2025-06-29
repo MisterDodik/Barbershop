@@ -81,3 +81,31 @@ func (app *application) bookAppointment(w http.ResponseWriter, r *http.Request) 
 		app.internalServerError(w, r, err)
 	}
 }
+
+func (app *application) cancelAppointment(w http.ResponseWriter, r *http.Request) {
+	slotIDstr := chi.URLParam(r, "slotID")
+	slotID, err := strconv.ParseInt(slotIDstr, 10, 64)
+
+	if err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	user := getUserFromContext(r)
+
+	if err := app.store.TimeSlots.UpdateStatus(r.Context(), slotID, "available", &user.ID); err != nil {
+		switch err {
+		case store.Error_NotFound:
+			app.notFoundResponse(w, r, err)
+			return
+		default:
+			app.internalServerError(w, r, err)
+			return
+		}
+	}
+
+	if err := app.jsonResponse(w, http.StatusOK, "appointment canceled"); err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+}
