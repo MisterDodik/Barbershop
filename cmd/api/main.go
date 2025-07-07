@@ -7,6 +7,7 @@ import (
 	"github.com/MisterDodik/Barbershop/internal/auth"
 	"github.com/MisterDodik/Barbershop/internal/db"
 	"github.com/MisterDodik/Barbershop/internal/env"
+	"github.com/MisterDodik/Barbershop/internal/mailer"
 	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/joho/godotenv"
 )
@@ -34,6 +35,13 @@ func main() {
 				iss:     env.GetString("AUTH_TOKEN_ISSUER", "admin"),
 			},
 		},
+		mail: mailConfig{
+			fromEmail: env.GetString("FROM_EMAIL", ""),
+			exp:       time.Hour * 24 * 3,
+			mailTrap: mailTrapConfig{
+				apiKey: env.GetString("MAILTRAP_API_KEY", ""),
+			},
+		},
 	}
 
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
@@ -44,10 +52,15 @@ func main() {
 
 	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
 
+	mailer, err := mailer.NewMailTrapMailer(cfg.mail.mailTrap.apiKey, cfg.mail.fromEmail)
+	if err != nil {
+		log.Fatal(err)
+	}
 	app := &application{
 		config:        cfg,
 		store:         store,
 		authenticator: jwtAuthenticator,
+		mailer:        mailer,
 	}
 
 	mux := app.mount()
