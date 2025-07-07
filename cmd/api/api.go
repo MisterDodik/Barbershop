@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/MisterDodik/Barbershop/internal/auth"
+	"github.com/MisterDodik/Barbershop/internal/mailer"
 	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,12 +17,23 @@ type application struct {
 	config        config
 	store         store.Storage
 	authenticator auth.Authenticator
+	mailer        mailer.Client
 }
 type config struct {
 	addr string
 	db   dbConfig
 	auth authConfig
+	mail mailConfig
 }
+type mailConfig struct {
+	mailTrap  mailTrapConfig
+	fromEmail string
+	exp       time.Duration
+}
+type mailTrapConfig struct {
+	apiKey string
+}
+
 type authConfig struct {
 	basic basicConfig
 	token tokenConfig
@@ -75,6 +87,13 @@ func (app *application) mount() http.Handler {
 
 				r.Post("/cancel_appointment/{slotID}", app.cancelAppointment)
 			})
+		})
+
+		r.Route("/user", func(r chi.Router) {
+			r.Use(app.TokenAuthMiddleware)
+
+			r.Get("/user_info", app.getMyInfo)
+			r.Post("/reset_password", app.resetPassword)
 		})
 
 		r.Route("/authentication", func(r chi.Router) {
