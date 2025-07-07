@@ -89,6 +89,8 @@ func (u *UserStorage) GetByEmail(ctx context.Context, email string) (*User, erro
 		SELECT id, email, first_name, last_name, username, password, created_at, roles FROM users 
 		WHERE email = $1
 	`
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 
 	var user User
 	err := u.db.QueryRowContext(
@@ -122,6 +124,8 @@ func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) 
 		SELECT id, email, first_name, last_name, username, password, created_at, roles FROM users 
 		WHERE id = $1
 	`
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 
 	var user User
 	err := u.db.QueryRowContext(
@@ -148,4 +152,34 @@ func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) 
 		}
 	}
 	return &user, nil
+}
+
+func (u *UserStorage) ResetPassword(ctx context.Context, user *User) error {
+	query := `
+		UPDATE users
+		SET password = $1
+		WHERE id = $2;
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	rows, err := u.db.ExecContext(
+		ctx,
+		query,
+		user.Password.hash,
+		user.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	num, _ := rows.RowsAffected()
+
+	if num == 0 {
+		return Error_NotFound
+	}
+
+	return nil
 }

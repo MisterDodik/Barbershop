@@ -18,6 +18,7 @@ type Storage struct {
 		Create(context.Context, *User) error
 		GetByID(context.Context, int64) (*User, error)
 		GetByEmail(context.Context, string) (*User, error)
+		ResetPassword(context.Context, *User) error
 	}
 	TimeSlots interface {
 		GetSlots(context.Context, time.Time, int64, bool) ([]TimeSlot, error)
