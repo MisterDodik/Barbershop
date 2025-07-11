@@ -17,7 +17,10 @@ const version = "0.0.1"
 func main() {
 	godotenv.Load()
 	cfg := config{
-		addr: env.GetString("ADDR", ":8080"),
+		BarbershopName: env.GetString("NAME", "Ime_Frizerskog_Salona"),
+		addr:           env.GetString("ADDR", ":8080"),
+		frontEndURL:    env.GetString("FRONTEND_URL", "localhost:3000"),
+		env:            env.GetString("ENV", "development"),
 		db: dbConfig{
 			addr:         env.GetString("DB_ADDR", "postgres://postgres:admin@localhost/barbershop?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
@@ -36,10 +39,14 @@ func main() {
 			},
 		},
 		mail: mailConfig{
-			fromEmail: env.GetString("FROM_EMAIL", ""),
-			exp:       time.Hour * 24 * 3,
+			fromEmail: env.GetString("FROM_EMAIL", "test@example.com"),
+			exp:       time.Minute * 15,
 			mailTrap: mailTrapConfig{
-				apiKey: env.GetString("MAILTRAP_API_KEY", ""),
+				apiKey:   env.GetString("MAILTRAP_API_KEY", ""),
+				host:     env.GetString("MAILTRAP_HOST", ""),
+				port:     env.GetInt("MAILTRAP_PORT", 587),
+				username: env.GetString("MAILTRAP_USERNAME", ""),
+				password: env.GetString("MAILTRAP_PASSWORD", ""),
 			},
 		},
 	}
@@ -52,7 +59,14 @@ func main() {
 
 	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
 
-	mailer, err := mailer.NewMailTrapMailer(cfg.mail.mailTrap.apiKey, cfg.mail.fromEmail)
+	mailer, err := mailer.NewMailTrapMailer(
+		cfg.mail.mailTrap.apiKey,
+		cfg.mail.fromEmail,
+		cfg.mail.mailTrap.host,
+		cfg.mail.mailTrap.username,
+		cfg.mail.mailTrap.password,
+		cfg.mail.mailTrap.port,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
