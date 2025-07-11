@@ -1,62 +1,74 @@
 package mailer
 
 import (
+	"bytes"
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
+	"text/template"
+
+	gomail "gopkg.in/gomail.v2"
 )
 
 type MailTrapMailer struct {
 	apiKey    string
 	fromEmail string
+	host      string
+	port      int
+	username  string
+	password  string
 }
 
-func NewMailTrapMailer(apiKey, fromEmail string) (*MailTrapMailer, error) {
-	if apiKey == "" {
-		return &MailTrapMailer{}, errors.New("api key is required")
+func NewMailTrapMailer(apiKey, fromEmail, host, username, password string, port int) (*MailTrapMailer, error) {
+	if apiKey == "" || fromEmail == "" || host == "" || username == "" || password == "" {
+		return &MailTrapMailer{}, errors.New("some fields are missing")
 	}
 
 	return &MailTrapMailer{
 		apiKey:    apiKey,
 		fromEmail: fromEmail,
+		host:      host,
+		port:      port,
+		username:  username,
+		password:  password,
 	}, nil
 }
 
-func (m *MailTrapMailer) Send(templateFile, username, email string, data any, isSandbox bool) error {
+func (m *MailTrapMailer) Send(templateFile, username, email string, data any, isSandbox bool) (int, error) {
+	//Template parsing
 
-	return nil
-}
-
-func main() {
-
-	url := "https://sandbox.api.mailtrap.io/api/send/3872073"
-	method := "POST"
-
-	payload := strings.NewReader(`{\"from\":{\"email\":\"hello@example.com\",\"name\":\"Mailtrap Test\"},\"to\":[{\"email\":\"drazenpetrovic66@gmail.com\"}],\"subject\":\"You are awesome!\",\"text\":\"Congrats for sending test email with Mailtrap!\",\"category\":\"Integration Test\"}`)
-
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, payload)
-
-	if err != nil {
-		fmt.Println(err)
-		return
+	if !isSandbox {
+		return http.StatusAccepted, errors.New("isSandbox is set to false")
 	}
-	req.Header.Add("Authorization", "Bearer <YOUR_API_TOKEN>")
-	req.Header.Add("Content-Type", "application/json")
 
-	res, err := client.Do(req)
+	tmpl, err := template.ParseFS(FS, "templates/"+templateFile)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return -1, err
 	}
-	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	subject := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(subject, "subject", data)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return -1, err
 	}
-	fmt.Println(string(body))
+	body := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(body, "body", data)
+	if err != nil {
+		return -1, err
+	}
+
+	message := gomail.NewMessage()
+	message.SetHeader("From", m.fromEmail)
+	message.SetHeader("To", email)
+	message.SetHeader("Subject", subject.String())
+
+	message.AddAlternative("text/html", body.String())
+
+	dialer := gomail.NewDialer(m.host, m.port, m.username, m.apiKey)
+
+	for i := 0; i < 3; i++ {
+		if err := dialer.DialAndSend(message); err == nil {
+			return 200, nil
+		}
+	}
+	return -1, err
 }
