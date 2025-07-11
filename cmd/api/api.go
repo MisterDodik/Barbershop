@@ -20,10 +20,13 @@ type application struct {
 	mailer        mailer.Client
 }
 type config struct {
-	addr string
-	db   dbConfig
-	auth authConfig
-	mail mailConfig
+	BarbershopName string
+	frontEndURL    string
+	env            string
+	addr           string
+	db             dbConfig
+	auth           authConfig
+	mail           mailConfig
 }
 type mailConfig struct {
 	mailTrap  mailTrapConfig
@@ -31,7 +34,11 @@ type mailConfig struct {
 	exp       time.Duration
 }
 type mailTrapConfig struct {
-	apiKey string
+	apiKey   string
+	host     string
+	port     int
+	username string
+	password string
 }
 
 type authConfig struct {
@@ -90,10 +97,13 @@ func (app *application) mount() http.Handler {
 		})
 
 		r.Route("/user", func(r chi.Router) {
-			r.Use(app.TokenAuthMiddleware)
+			r.Post("/request_password_reset", app.requestPasswordReset)
+			r.Post("/update_password", app.updatePassword)
 
-			r.Get("/user_info", app.getMyInfo)
-			r.Post("/reset_password", app.resetPassword)
+			r.Route("/", func(r chi.Router) {
+				r.Use(app.TokenAuthMiddleware)
+				r.Get("/user_info", app.getMyInfo)
+			})
 		})
 
 		r.Route("/authentication", func(r chi.Router) {

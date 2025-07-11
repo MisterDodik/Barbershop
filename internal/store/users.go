@@ -153,33 +153,3 @@ func (u *UserStorage) GetByID(ctx context.Context, userID int64) (*User, error) 
 	}
 	return &user, nil
 }
-
-func (u *UserStorage) ResetPassword(ctx context.Context, user *User) error {
-	query := `
-		UPDATE users
-		SET password = $1
-		WHERE id = $2;
-	`
-
-	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
-	defer cancel()
-
-	rows, err := u.db.ExecContext(
-		ctx,
-		query,
-		user.Password.hash,
-		user.ID,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	num, _ := rows.RowsAffected()
-
-	if num == 0 {
-		return Error_NotFound
-	}
-
-	return nil
-}
