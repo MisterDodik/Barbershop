@@ -18,7 +18,6 @@ type Storage struct {
 		Create(context.Context, *User) error
 		GetByID(context.Context, int64) (*User, error)
 		GetByEmail(context.Context, string) (*User, error)
-		ResetPassword(context.Context, *User) error
 	}
 	TimeSlots interface {
 		GetSlots(context.Context, time.Time, int64, bool) ([]TimeSlot, error)
@@ -33,12 +32,18 @@ type Storage struct {
 		CreateOrUpdateSettings(context.Context, int64, map[string]string, int, int) error
 		GetSettings(context.Context, int64) (*WorkerProfile, error)
 	}
+	PasswordManager interface {
+		CreateResetPasswordRequest(context.Context, int64, string, time.Duration) error
+		DeleteResetPasswordRequest(context.Context, int64) error
+		UpdatePassword(context.Context, password, string) (*int64, error)
+	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
-		Users:     &UserStorage{db},
-		TimeSlots: &TimeSlotsStorage{db},
-		Workers:   &WorkerProfileStorage{db},
+		Users:           &UserStorage{db},
+		TimeSlots:       &TimeSlotsStorage{db},
+		Workers:         &WorkerProfileStorage{db},
+		PasswordManager: &PasswordManagerStorage{db},
 	}
 }
