@@ -1,0 +1,337 @@
+{
+    "info": {
+        "_postman_id": "b5979e60-30ac-4982-a0c9-9d0183251ed1",
+        "name": "barbershop admin endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "health",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:3000/v1/health",
+                    "path": [
+                        "v1",
+                        "health"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                }
+            }
+        },
+        {
+            "name": "admin panel calendar",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/get_calendar",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "get_calendar"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"day\":\"2025-06-01\"\n}"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njg1MiwiaWF0IjoxNzUxMjM3NjUyLCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzY1Miwic3ViIjoxOH0.HvkaIw6qHpoCMjfACk0U15p_oJ3vMqXpPFdE-NT4vdI",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "zauzeti termini na x dan",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/get_booked_dates",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "get_booked_dates"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"day\":\"2025-07-01\"\n}"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njg1MiwiaWF0IjoxNzUxMjM3NjUyLCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzY1Miwic3ViIjoxOH0.HvkaIw6qHpoCMjfACk0U15p_oJ3vMqXpPFdE-NT4vdI",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "update work settings",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/update_work_settings",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "update_work_settings"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"working_hours\" :{\n    \"monday\": \"07:00-11:00\",\n    \"tuesday\": \"07:00-11:00\",\n    \"wednesday\": \"07:00-11:00\",\n    \"thursday\" : \"07:00-11:00\",\n    \"friday\" : \"07:00-11:00\"\n  },\n  \"appointment_duration\": 30,\n  \"pause_between\": 5\n}"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "get work settings",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/get_work_settings",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "get_work_settings"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "generate slots",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/generate_slots/3",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "generate_slots",
+                        "3"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "add custom slot",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/add_custom_slot",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "add_custom_slot"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"start_time\":\"2025-06-28 09:00:00\",\n  \"appointment_duration\":\"45m\"\n}"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "remove slot",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/remove_slot/13",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "remove_slot",
+                        "13"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "book for someone",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/bookForSomeone/173",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "bookForSomeone",
+                        "173"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxNDM1OCwiaWF0IjoxNzUxMTU1MTU4LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1NTE1OCwic3ViIjoxOH0.WVavswAfuR-pXPlrG1_zA3Xn4gWIHuPufgQh_jRpwkM",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "update someone's appointment status",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/admin/change_appointment_status",
+                    "path": [
+                        "v1",
+                        "admin",
+                        "change_appointment_status"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"slot_id\" : 177,\n  \"status\" : \"missed\"\n}"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5OTA2MiwiaWF0IjoxNzUxMjM5ODYyLCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzOTg2Miwic3ViIjoxOH0.C9YnKRP78hAHpMp5AIcjdAysATg5ETd9_Nj8-MWjSOo",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

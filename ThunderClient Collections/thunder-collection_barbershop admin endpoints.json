@@ -1,0 +1,192 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "barbershop admin endpoints",
+    "collectionId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+    "dateExported": "2025-08-12T22:57:58.083Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "147e8edc-3c99-4108-8675-4bfcafe74dbf",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "health",
+            "url": "http://localhost:3000/v1/health",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2025-06-29T23:25:15.887Z",
+            "modified": "2025-06-29T23:25:15.887Z",
+            "headers": []
+        },
+        {
+            "_id": "65c705fb-6a3a-4abe-a1d5-5937d3a13953",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "admin panel calendar",
+            "url": "http://localhost:3000/v1/admin/get_calendar",
+            "method": "POST",
+            "sortNum": 100000,
+            "created": "2025-06-29T23:25:15.894Z",
+            "modified": "2025-06-29T23:25:15.894Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"day\":\"2025-06-01\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njg1MiwiaWF0IjoxNzUxMjM3NjUyLCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzY1Miwic3ViIjoxOH0.HvkaIw6qHpoCMjfACk0U15p_oJ3vMqXpPFdE-NT4vdI"
+            }
+        },
+        {
+            "_id": "fe3a2ff6-6420-4cc0-9444-b0c77e0c0086",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "zauzeti termini na x dan",
+            "url": "http://localhost:3000/v1/admin/get_booked_dates",
+            "method": "POST",
+            "sortNum": 110000,
+            "created": "2025-06-29T23:25:15.895Z",
+            "modified": "2025-06-29T23:25:15.895Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"day\":\"2025-07-01\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njg1MiwiaWF0IjoxNzUxMjM3NjUyLCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzY1Miwic3ViIjoxOH0.HvkaIw6qHpoCMjfACk0U15p_oJ3vMqXpPFdE-NT4vdI"
+            }
+        },
+        {
+            "_id": "a77247c9-1bbc-447a-9c12-cfe382ce8e06",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "update work settings",
+            "url": "http://localhost:3000/v1/admin/update_work_settings",
+            "method": "POST",
+            "sortNum": 120000,
+            "created": "2025-06-29T23:25:15.896Z",
+            "modified": "2025-06-29T23:25:15.896Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"working_hours\" :{\n    \"monday\": \"07:00-11:00\",\n    \"tuesday\": \"07:00-11:00\",\n    \"wednesday\": \"07:00-11:00\",\n    \"thursday\" : \"07:00-11:00\",\n    \"friday\" : \"07:00-11:00\"\n  },\n  \"appointment_duration\": 30,\n  \"pause_between\": 5\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0"
+            }
+        },
+        {
+            "_id": "70206508-b65a-485b-94c1-f5edf0d60df6",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "get work settings",
+            "url": "http://localhost:3000/v1/admin/get_work_settings",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2025-06-29T23:25:15.897Z",
+            "modified": "2025-06-29T23:25:15.897Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0"
+            }
+        },
+        {
+            "_id": "bedf3dcf-0602-484c-ba3b-80d568164b44",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "generate slots",
+            "url": "http://localhost:3000/v1/admin/generate_slots/3",
+            "method": "POST",
+            "sortNum": 140000,
+            "created": "2025-06-29T23:25:15.898Z",
+            "modified": "2025-06-29T23:25:15.898Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0"
+            }
+        },
+        {
+            "_id": "a93bffde-1d50-47d9-841a-fc2212463b2c",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "add custom slot",
+            "url": "http://localhost:3000/v1/admin/add_custom_slot",
+            "method": "POST",
+            "sortNum": 150000,
+            "created": "2025-06-29T23:25:15.899Z",
+            "modified": "2025-06-29T23:25:15.899Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"start_time\":\"2025-06-28 09:00:00\",\n  \"appointment_duration\":\"45m\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0"
+            }
+        },
+        {
+            "_id": "51a12899-0850-4f46-b1af-00fd3853f7db",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "remove slot",
+            "url": "http://localhost:3000/v1/admin/remove_slot/13",
+            "method": "POST",
+            "sortNum": 160000,
+            "created": "2025-06-29T23:25:15.900Z",
+            "modified": "2025-06-29T23:25:15.900Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxMDYzOSwiaWF0IjoxNzUxMTUxNDM5LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1MTQzOSwic3ViIjoxOH0.XSGY3Dx5aMKrXkAydTAtm8q5I1tEZ3IuPYUJ5w9TjH0"
+            }
+        },
+        {
+            "_id": "6c4473ec-77ab-491a-91bd-a62690b0fb5a",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "book for someone",
+            "url": "http://localhost:3000/v1/admin/bookForSomeone/173",
+            "method": "POST",
+            "sortNum": 170000,
+            "created": "2025-06-29T23:25:15.901Z",
+            "modified": "2025-06-29T23:25:15.901Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQxNDM1OCwiaWF0IjoxNzUxMTU1MTU4LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTE1NTE1OCwic3ViIjoxOH0.WVavswAfuR-pXPlrG1_zA3Xn4gWIHuPufgQh_jRpwkM"
+            }
+        },
+        {
+            "_id": "e62e6800-481b-496e-8652-c099cc91ba6a",
+            "colId": "43a5611b-4d3c-457c-8b06-eec8dfe6ef72",
+            "containerId": "",
+            "name": "update someone's appointment status",
+            "url": "http://localhost:3000/v1/admin/change_appointment_status",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2025-06-29T23:25:15.902Z",
+            "modified": "2025-06-29T23:31:44.325Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"slot_id\" : 177,\n  \"status\" : \"missed\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5OTA2MiwiaWF0IjoxNzUxMjM5ODYyLCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzOTg2Miwic3ViIjoxOH0.C9YnKRP78hAHpMp5AIcjdAysATg5ETd9_Nj8-MWjSOo"
+            }
+        }
+    ],
+    "ref": "Ud5T05QGn2ysxk9B7W_OBonXsf6cXFqP8tSV1MbrfO7vO_22vsVl7mtSV7uln_65R-0uv7HThdp5Xvysjc6irw"
+}

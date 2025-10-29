@@ -1,0 +1,287 @@
+{
+    "info": {
+        "_postman_id": "25bb4526-bcfe-4525-84c4-95032ed07738",
+        "name": "barbershop user endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "health",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:3000/v1/health",
+                    "path": [
+                        "v1",
+                        "health"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                }
+            }
+        },
+        {
+            "name": "slobodni termini na x dan",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/appointment/get_available_dates",
+                    "path": [
+                        "v1",
+                        "appointment",
+                        "get_available_dates"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"day\":\"2025-06-25\",\n  \"worker_id\":18\n}"
+                }
+            }
+        },
+        {
+            "name": "register user",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/authentication/user",
+                    "path": [
+                        "v1",
+                        "authentication",
+                        "user"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"first_name\":\"drazen\",\n  \"last_name\":\"petrovic\",\n  \"username\":\"misterdodik\",\n  \"email\":\"drazenpetrovic56@gmail.com\",\n  \"password\":\"123\",\n  \"role\":\"customer\"\n}"
+                }
+            }
+        },
+        {
+            "name": "get token",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/authentication/token",
+                    "path": [
+                        "v1",
+                        "authentication",
+                        "token"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"email\":\"drazenpetrovic56@gmail.com\",\n  \"password\":\"12345\"\n}"
+                }
+            }
+        },
+        {
+            "name": "get my appointments",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:3000/v1/appointment/my",
+                    "path": [
+                        "v1",
+                        "appointment",
+                        "my"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njc1NywiaWF0IjoxNzUxMjM3NTU3LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzU1Nywic3ViIjo3fQ.d0RwuyxG_LWns7jF8p0Mv9qNQ6IdC7_nFv72-U-LYRs",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "get user info",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:3000/v1/user/user_info",
+                    "path": [
+                        "v1",
+                        "user",
+                        "user_info"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTk5NTk0NCwiaWF0IjoxNzUxNzM2NzQ0LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTczNjc0NCwic3ViIjoxOH0.semtzhOXIBnGnwUTobu-hLKQmEN4V8_HNzHxvp_l-Q0",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "book appointment",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/appointment/book/18/162",
+                    "path": [
+                        "v1",
+                        "appointment",
+                        "book",
+                        "18",
+                        "162"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njc1NywiaWF0IjoxNzUxMjM3NTU3LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzU1Nywic3ViIjo3fQ.d0RwuyxG_LWns7jF8p0Mv9qNQ6IdC7_nFv72-U-LYRs",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "update password",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/user/update_password",
+                    "path": [
+                        "v1",
+                        "user",
+                        "update_password"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"token\" : \"7748ecb7-76b4-4402-890f-ed2afb3dad72\",\n  \"new_password\" : \"1234\"\n}"
+                }
+            }
+        },
+        {
+            "name": "request password reset",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/user/request_password_reset",
+                    "path": [
+                        "v1",
+                        "user",
+                        "request_password_reset"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"email\" : \"asd@gmail.com\"\n}"
+                }
+            }
+        },
+        {
+            "name": "cancel appointment",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:3000/v1/appointment/cancel_appointment/177",
+                    "path": [
+                        "v1",
+                        "appointment",
+                        "cancel_appointment",
+                        "177"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000"
+                },
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5ODg0NiwiaWF0IjoxNzUxMjM5NjQ2LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzOTY0Niwic3ViIjo3fQ.A96uAmq6XE9rRKzQWVe61-Agc37iSn6mZHA5btePs30",
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

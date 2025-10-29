@@ -1,0 +1,172 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "barbershop user endpoints",
+    "collectionId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+    "dateExported": "2025-08-12T22:57:52.162Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "04b4db74-4cbb-434e-8122-e53265b3da7c",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "health",
+            "url": "http://localhost:3000/v1/health",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2025-06-16T20:42:07.783Z",
+            "modified": "2025-06-16T20:42:15.661Z",
+            "headers": []
+        },
+        {
+            "_id": "c79eea92-300c-4c16-acd0-fce2796e21fd",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "slobodni termini na x dan",
+            "url": "http://localhost:3000/v1/appointment/get_available_dates",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2025-06-14T21:23:16.634Z",
+            "modified": "2025-06-25T19:02:20.382Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"day\":\"2025-06-25\",\n  \"worker_id\":18\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "8c821f19-6fe8-45ed-9a2e-178725a4336f",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "register user",
+            "url": "http://localhost:3000/v1/authentication/user",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2025-06-14T22:58:27.604Z",
+            "modified": "2025-07-08T22:55:17.876Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"first_name\":\"drazen\",\n  \"last_name\":\"petrovic\",\n  \"username\":\"misterdodik\",\n  \"email\":\"drazenpetrovic56@gmail.com\",\n  \"password\":\"123\",\n  \"role\":\"customer\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "3c6c49a6-0cf8-4879-8aee-af4efe340fad",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "get token",
+            "url": "http://localhost:3000/v1/authentication/token",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2025-06-20T23:52:06.810Z",
+            "modified": "2025-07-10T23:47:19.672Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\":\"drazenpetrovic56@gmail.com\",\n  \"password\":\"12345\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "d80b7168-638b-4c19-a9b7-d4ab13d1e504",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "get my appointments",
+            "url": "http://localhost:3000/v1/appointment/my",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2025-06-21T23:41:16.765Z",
+            "modified": "2025-06-29T22:52:45.882Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njc1NywiaWF0IjoxNzUxMjM3NTU3LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzU1Nywic3ViIjo3fQ.d0RwuyxG_LWns7jF8p0Mv9qNQ6IdC7_nFv72-U-LYRs"
+            }
+        },
+        {
+            "_id": "c49fc2ab-f0f2-44b3-92dc-37375a43fd3e",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "get user info",
+            "url": "http://localhost:3000/v1/user/user_info",
+            "method": "GET",
+            "sortNum": 45000,
+            "created": "2025-07-05T17:30:38.371Z",
+            "modified": "2025-07-05T17:32:42.010Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTk5NTk0NCwiaWF0IjoxNzUxNzM2NzQ0LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTczNjc0NCwic3ViIjoxOH0.semtzhOXIBnGnwUTobu-hLKQmEN4V8_HNzHxvp_l-Q0"
+            }
+        },
+        {
+            "_id": "c17a59ef-22f5-495b-8174-a38650a66ac1",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "book appointment",
+            "url": "http://localhost:3000/v1/appointment/book/18/162",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2025-06-16T20:43:39.919Z",
+            "modified": "2025-06-29T22:53:45.265Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5Njc1NywiaWF0IjoxNzUxMjM3NTU3LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzNzU1Nywic3ViIjo3fQ.d0RwuyxG_LWns7jF8p0Mv9qNQ6IdC7_nFv72-U-LYRs"
+            }
+        },
+        {
+            "_id": "4a5c54e0-a892-4147-b604-cb85e48758b2",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "update password",
+            "url": "http://localhost:3000/v1/user/update_password",
+            "method": "POST",
+            "sortNum": 55000,
+            "created": "2025-07-05T17:52:28.443Z",
+            "modified": "2025-07-11T14:12:05.096Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"token\" : \"7748ecb7-76b4-4402-890f-ed2afb3dad72\",\n  \"new_password\" : \"1234\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "92b11997-8a8b-4596-97c5-6144dd5c717c",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "request password reset",
+            "url": "http://localhost:3000/v1/user/request_password_reset",
+            "method": "POST",
+            "sortNum": 57500,
+            "created": "2025-07-08T22:48:00.840Z",
+            "modified": "2025-07-11T09:45:57.545Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\" : \"asd@gmail.com\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "3e9311d6-7644-44ad-b751-e87a34a976e9",
+            "colId": "e59c911d-5b35-4d06-ad97-783b8446b19e",
+            "containerId": "",
+            "name": "cancel appointment",
+            "url": "http://localhost:3000/v1/appointment/cancel_appointment/177",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2025-06-29T23:23:42.105Z",
+            "modified": "2025-06-29T23:31:58.694Z",
+            "headers": [],
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhZG1pbiIsImV4cCI6MTc1MTQ5ODg0NiwiaWF0IjoxNzUxMjM5NjQ2LCJpc3MiOiJhZG1pbiIsIm5iZiI6MTc1MTIzOTY0Niwic3ViIjo3fQ.A96uAmq6XE9rRKzQWVe61-Agc37iSn6mZHA5btePs30"
+            }
+        }
+    ],
+    "ref": "oYn8CB8VZ1Jte4I0fCH1COAIKVIqz046qI-sBC6Tld9V2rqhwp_VsQgRoHdx8-65zzv1C9aTgjp1qQB1hTzsGA"
+}
