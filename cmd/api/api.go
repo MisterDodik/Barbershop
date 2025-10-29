@@ -20,13 +20,14 @@ type application struct {
 	mailer        mailer.Client
 }
 type config struct {
-	BarbershopName string
-	frontEndURL    string
-	env            string
-	addr           string
-	db             dbConfig
-	auth           authConfig
-	mail           mailConfig
+	BarbershopName     string
+	CancellationWindow string
+	frontEndURL        string
+	env                string
+	addr               string
+	db                 dbConfig
+	auth               authConfig
+	mail               mailConfig
 }
 type mailConfig struct {
 	mailTrap  mailTrapConfig
@@ -108,6 +109,7 @@ func (app *application) mount() http.Handler {
 
 		r.Route("/authentication", func(r chi.Router) {
 			r.Post("/user", app.registerUserHandler)
+			r.Post("/activate/{token}", app.activateUserHandler)
 			r.Post("/token", app.createTokenHandler)
 		})
 
