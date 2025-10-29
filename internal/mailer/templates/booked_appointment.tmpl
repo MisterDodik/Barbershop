@@ -1,0 +1,26 @@
+{{define "subject"}} Potvrda rezervacije - {{.BarbershopName}} {{end}}
+
+{{define "body"}}
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    <p>Zdravo {{.Username}},</p>
+    <p>Uspešno ste rezervisali termin u {{.BarbershopName}}.</p>
+    <p>Detalji rezervacije:</p>
+    <ul>
+      <li>Datum: {{.AppointmentDate}}</li>
+      <li>Vreme: {{.AppointmentTime}}</li>
+      <li>Frizer: {{.BarberName}}</li>
+    </ul>
+    <p>Ukoliko želite da otkažete termin, to možete uraditi najkasnije {{.CancelWindow}} pre termina na ovaj <a href="{{.CancelURL}}">link</a>.</p>
+    <p>Ako niste vi napravili ovu rezervaciju, slobodno ignorišite ovu poruku.</p>
+
+    <p>Hvala što ste izabrali {{.BarbershopName}}!</p>
+    <p>{{.BarbershopName}} tim</p>
+  </body>
+</html>
+{{end}}
