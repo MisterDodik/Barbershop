@@ -207,36 +207,35 @@ func (s *TimeSlotsStorage) GetBookedNumberForAMonth(ctx context.Context, month i
 	return timeSlots, nil
 }
 
-func (s *TimeSlotsStorage) Book(ctx context.Context, slotID, workerID, userID int64) error {
+func (s *TimeSlotsStorage) Book(ctx context.Context, slotID, workerID, userID int64) (*time.Time, error) {
 	query := `
 		UPDATE time_slots
 		SET is_booked = true, user_id = $2, status = 'booked'
 		WHERE id = $1 AND worker_id = $3 AND is_booked = false
+		RETURNING start_time
 	`
 	//TODO mzd u ovom query treba izbaciti ovo worker_id mzd je double checking bez razloga al aj
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
+
+	var bookedTime time.Time
 	//TODO  -dodaj da izbaci gresku ako se bukira termin koji je vec zauzet
-	rows, err := s.db.ExecContext(
+	err := s.db.QueryRowContext(
 		ctx,
 		query,
 		slotID,
 		userID,
 		workerID,
+	).Scan(
+		&bookedTime,
 	)
 	if err != nil {
-		return err
+		return &time.Time{}, err
 	}
-
-	rowsAffected, err := rows.RowsAffected()
-	if err != nil {
-		return err
+	if err == sql.ErrNoRows {
+		return &time.Time{}, Error_NotFound
 	}
-
-	if rowsAffected == 0 {
-		return Error_NotFound
-	}
-	return nil
+	return &bookedTime, nil
 }
 
 func (s *TimeSlotsStorage) CreateNewSlot(ctx context.Context, workerID int64, timeStamp time.Time, duration time.Duration) (*time.Time, error) {
@@ -318,7 +317,7 @@ func (s *TimeSlotsStorage) RemoveSlot(ctx context.Context, slotID int64) error {
 	return nil
 }
 
-func (s *TimeSlotsStorage) UpdateStatus(ctx context.Context, slotID int64, newStatus string, userID *int64) error {
+func (s *TimeSlotsStorage) UpdateStatus(ctx context.Context, slotID int64, newStatus string, userID *int64, cancellationWindow string) error {
 	query := `
 		UPDATE time_slots
 		SET status = $1
@@ -334,11 +333,9 @@ func (s *TimeSlotsStorage) UpdateStatus(ctx context.Context, slotID int64, newSt
 	args = append(args, slotID)
 
 	if userID != nil {
-		query += ` AND user_id = $3 AND status = 'booked'`
-		args = append(args, *userID)
+		query += ` AND user_id = $3 AND status = 'booked' AND NOW() + $4::INTERVAL < start_time`
+		args = append(args, *userID, cancellationWindow)
 	}
-
-	//TODO mogu dodati da se moze promijeniti samo ako je status = 'booked', ali ne moram (makar za admina)
 	rows, err := s.db.ExecContext(
 		ctx,
 		query,

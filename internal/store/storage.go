@@ -15,7 +15,10 @@ var (
 
 type Storage struct {
 	Users interface {
-		Create(context.Context, *User) error
+		Create(context.Context, *sql.Tx, *User) error
+		CreateAndInvite(context.Context, *User, string, time.Duration) error
+		DeleteUserWithInvitation(context.Context, int64, string) error
+		Activate(context.Context, string) error
 		GetByID(context.Context, int64) (*User, error)
 		GetByEmail(context.Context, string) (*User, error)
 	}
@@ -23,10 +26,10 @@ type Storage struct {
 		GetSlots(context.Context, time.Time, int64, bool) ([]TimeSlot, error)
 		GetMyAppointments(context.Context, int64) ([]TimeSlot, error)
 		GetBookedNumberForAMonth(context.Context, int, int64) ([]NumberOfSlots, error)
-		Book(context.Context, int64, int64, int64) error
+		Book(context.Context, int64, int64, int64) (*time.Time, error)
 		CreateNewSlot(context.Context, int64, time.Time, time.Duration) (*time.Time, error)
 		RemoveSlot(context.Context, int64) error
-		UpdateStatus(context.Context, int64, string, *int64) error
+		UpdateStatus(context.Context, int64, string, *int64, string) error
 	}
 	Workers interface {
 		CreateOrUpdateSettings(context.Context, int64, map[string]string, int, int) error
@@ -46,4 +49,19 @@ func NewStorage(db *sql.DB) Storage {
 		Workers:         &WorkerProfileStorage{db},
 		PasswordManager: &PasswordManagerStorage{db},
 	}
+}
+
+func withTx(db *sql.DB, ctx context.Context, fn func(*sql.Tx) error) error {
+	tx, err := db.BeginTx(ctx, nil)
+
+	if err != nil {
+		return nil
+	}
+
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
