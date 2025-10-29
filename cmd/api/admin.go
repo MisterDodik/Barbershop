@@ -171,7 +171,7 @@ func (app *application) changeAppointmentStatus(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if err := app.store.TimeSlots.UpdateStatus(r.Context(), payload.SlotID, payload.Status, nil); err != nil {
+	if err := app.store.TimeSlots.UpdateStatus(r.Context(), payload.SlotID, payload.Status, nil, ""); err != nil {
 		switch err {
 		case store.Error_NotFound:
 			app.notFoundResponse(w, r, err)
