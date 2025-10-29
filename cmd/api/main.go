@@ -7,7 +7,8 @@ import (
 	"github.com/MisterDodik/Barbershop/internal/auth"
 	"github.com/MisterDodik/Barbershop/internal/db"
 	"github.com/MisterDodik/Barbershop/internal/env"
-	
+	"github.com/MisterDodik/Barbershop/internal/mailer"
+
 	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/joho/godotenv"
 )
@@ -61,9 +62,6 @@ func main() {
 
 	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.auth.token.secret, cfg.auth.token.iss, cfg.auth.token.iss)
 
-<<<<<<< HEAD
-	
-=======
 	mailer, err := mailer.NewMailTrapMailer(
 		cfg.mail.mailTrap.apiKey,
 		cfg.mail.fromEmail,
@@ -72,7 +70,6 @@ func main() {
 		cfg.mail.mailTrap.password,
 		cfg.mail.mailTrap.port,
 	)
->>>>>>> 8ef8edd6005ff836a53be93d4a353d2c64c8c108
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +77,7 @@ func main() {
 		config:        cfg,
 		store:         store,
 		authenticator: jwtAuthenticator,
-		
+		mailer:        mailer,
 	}
 
 	mux := app.mount()
