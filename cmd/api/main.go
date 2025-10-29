@@ -17,10 +17,12 @@ const version = "0.0.1"
 func main() {
 	godotenv.Load()
 	cfg := config{
-		BarbershopName: env.GetString("NAME", "Ime_Frizerskog_Salona"),
-		addr:           env.GetString("ADDR", ":8080"),
-		frontEndURL:    env.GetString("FRONTEND_URL", "localhost:3000"),
-		env:            env.GetString("ENV", "development"),
+		BarbershopName:     env.GetString("NAME", "Ime_Frizerskog_Salona"),
+		CancellationWindow: env.GetString("CANCELLATION_WINDOW", "110m"),
+
+		addr:        env.GetString("ADDR", ":8080"),
+		frontEndURL: env.GetString("FRONTEND_URL", "localhost:3000"),
+		env:         env.GetString("ENV", "production"),
 		db: dbConfig{
 			addr:         env.GetString("DB_ADDR", "postgres://postgres:admin@localhost/barbershop?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
