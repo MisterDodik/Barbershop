@@ -7,6 +7,7 @@ import (
 
 	"github.com/MisterDodik/Barbershop/internal/auth"
 	"github.com/MisterDodik/Barbershop/internal/mailer"
+	"github.com/MisterDodik/Barbershop/internal/ratelimiter"
 	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -18,6 +19,7 @@ type application struct {
 	store         store.Storage
 	authenticator auth.Authenticator
 	mailer        mailer.Client
+	rateLimiter   ratelimiter.Limiter
 }
 type config struct {
 	BarbershopName     string
@@ -28,6 +30,7 @@ type config struct {
 	db                 dbConfig
 	auth               authConfig
 	mail               mailConfig
+	rateLimiter        ratelimiter.Config
 }
 type mailConfig struct {
 	mailTrap  mailTrapConfig
@@ -69,6 +72,8 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(app.RateLimiterMiddleware)
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{
 			"http://localhost:3000",                     // for local dev

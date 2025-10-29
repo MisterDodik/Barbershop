@@ -8,6 +8,7 @@ import (
 	"github.com/MisterDodik/Barbershop/internal/db"
 	"github.com/MisterDodik/Barbershop/internal/env"
 	"github.com/MisterDodik/Barbershop/internal/mailer"
+	"github.com/MisterDodik/Barbershop/internal/ratelimiter"
 
 	"github.com/MisterDodik/Barbershop/internal/store"
 	"github.com/joho/godotenv"
@@ -52,6 +53,11 @@ func main() {
 				password: env.GetString("MAILTRAP_PASSWORD", ""),
 			},
 		},
+		rateLimiter: ratelimiter.Config{
+			RequestsPerTimeFrame: env.GetInt("RATELIMITER_REQUESTS_COUNT", 20),
+			TimeFrame:            time.Second * 5,
+			Enabled:              true,
+		},
 	}
 
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
@@ -73,11 +79,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+		cfg.rateLimiter.RequestsPerTimeFrame,
+		cfg.rateLimiter.TimeFrame,
+	)
+
 	app := &application{
 		config:        cfg,
 		store:         store,
 		authenticator: jwtAuthenticator,
 		mailer:        mailer,
+		rateLimiter:   rateLimiter,
 	}
 
 	mux := app.mount()
