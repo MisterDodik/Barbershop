@@ -124,7 +124,7 @@ func (app *application) requestPasswordReset(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	resetURL := fmt.Sprintf("%s/reset-password?token=<%s>/", app.config.frontEndURL, plainToken)
+	resetURL := fmt.Sprintf("%s/reset-password?token=%s", app.config.frontEndURL, plainToken)
 	isProdEnv := app.config.env == "production"
 	vars := struct {
 		Username       string
