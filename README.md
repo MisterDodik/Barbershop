@@ -16,7 +16,7 @@ The backend is ready to integrate with a frontend application.
 ## Run Locally (Development)
 
 Requirements:
-- Go >= 1.25
+- Go >= 1.24
 - [Air](https://github.com/cosmtrek/air)
 
 Run:
